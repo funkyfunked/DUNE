@@ -1,14 +1,69 @@
+
 # Jellyfine - Enhanced Jellyfin Android TV Client
 --------------------------------------------------------------------------------------------------------------------
 
 [![GitHub release](https://img.shields.io/github/release/Sam42a/jellyfin-androidtv-Enhanced.svg)](https://github.com/Sam42a/jellyfin-androidtv-Enhanced/releases)
+
+
+Jellyfin Android TV is a Jellyfin client for Android TV, Nvidia Shield, and Amazon Fire TV devices. 
+
+
+
+
+<p align="center">
+  <img src="https://i.imgur.com/uAtZZ2T.png">
+</p>
+
+
+
+------------------------------------------------------------------------------------------------------------------------------------
+<h1 align="center">Jellyfin Android TV</h1>
+<h3 align="center">Part of the <a href="https://jellyfin.org">Jellyfin Project</a></h3>
+
+---
+
+<p align="center">
+<img alt="Logo banner" src="https://raw.githubusercontent.com/jellyfin/jellyfin-ux/master/branding/SVG/banner-logo-solid.svg?sanitize=true"/>
+<br/><br/>
+<a href="https://github.com/jellyfin/jellyfin-androidtv">
+<img alt="GPL 2.0 License" src="https://img.shields.io/github/license/jellyfin/jellyfin-androidtv.svg"/>
+</a>
+<a href="https://github.com/jellyfin/jellyfin-androidtv/releases">
+<img alt="Current Release" src="https://img.shields.io/github/release/jellyfin/jellyfin-androidtv.svg"/>
+</a>
+<a href="https://translate.jellyfin.org/projects/jellyfin-android/jellyfin-androidtv/">
+<img alt="Translation Status" src="https://translate.jellyfin.org/widgets/jellyfin-android/-/jellyfin-androidtv/svg-badge.svg"/>
+</a>
+<br/>
+<a href="https://opencollective.com/jellyfin">
+<img alt="Donate" src="https://img.shields.io/opencollective/all/jellyfin.svg?label=backers"/>
+</a>
+<a href="https://features.jellyfin.org">
+<img alt="Feature Requests" src="https://img.shields.io/badge/fider-vote%20on%20features-success.svg"/>
+</a>
+<a href="https://matrix.to/#/+jellyfin:matrix.org">
+<img alt="Chat on Matrix" src="https://img.shields.io/matrix/jellyfin:matrix.org.svg?logo=matrix"/>
+</a>
+<a href="https://www.reddit.com/r/jellyfin">
+<img alt="Join our Subreddit" src="https://img.shields.io/badge/reddit-r%2Fjellyfin-%23FF5700.svg"/>
+</a>
+<br/>
+<a href="https://play.google.com/store/apps/details?id=org.jellyfin.androidtv">
+<img width="153" alt="Jellyfin on Google Play" src="https://jellyfin.org/images/store-icons/google-play.png"/>
+</a>
+<a href="https://www.amazon.com/gp/aw/d/B07TX7Z725">
+<img width="153" alt="Jellyfin on Amazon Appstore" src="https://jellyfin.org/images/store-icons/amazon.png"/>
+</a>
+<a href="https://f-droid.org/en/packages/org.jellyfin.androidtv/">
+<img width="153" alt="Jellyfin on F-Droid" src="https://jellyfin.org/images/store-icons/fdroid.png"/>
+</a>
+<br/>
+<a href="https://repo.jellyfin.org/releases/client/androidtv/">Download archive</a>
+</p>
+
 Jellyfin Android TV is a Jellyfin client for Android TV, Nvidia Shield, and Amazon Fire TV devices.
 We welcome all contributions and pull requests! If you have a larger feature in mind please open an
 issue so we can discuss the implementation before you start. 
-
-<p align="center">
-  <img src="https://imgur.com/DFQiJvc.jpg" alt="Centered image">
-</p>
 
 ## Translating
 
@@ -19,26 +74,6 @@ Look through the following graphic to see if your native language could use some
 <a href="https://translate.jellyfin.org/engage/jellyfin-android/">
 <img alt="Detailed Translation Status" src="https://translate.jellyfin.org/widgets/jellyfin-android/-/jellyfin-androidtv/multi-auto.svg"/>
 </a>
-
-## Enhanced Features
-
-This fork includes several visual and usability enhancements to improve the Jellyfin experience on Android TV devices:
-
-### UI Improvements
-- **White Border Around Items**: Added borders to item cards for better visual contrast
-- **Bold Text**: Improved readability with bolder text throughout the interface
-- **Enhanced Backgrounds**: Polished UI with improved backgrounds for login, server and user selection screens
-- **Modified Toolbar**: Redesigned search/settings/users toolbar buttons for better visibility
-
-### New Customization Options
-- **Backdrop Control**: New preference settings to adjust backdrop dimming intensity
-- **Blur Control**: Customizable blur effect for backdrop images
-- **Genre Rows**: Added the ability to include genre-specific rows on the home screen with show/hide options
-- **Subtitle Enhancement**: New preference setting to control the boldness of subtitles
-
-### Technical Improvements
-- **Side-by-side Installation**: Modified package ID (org.jellyfyn.androidtv.enhanced) allows installation alongside the original Jellyfin app
-- **Fire TV Compatibility**: Fixed permission handling for better compatibility with Fire TV devices
 
 ## Build Process
 
