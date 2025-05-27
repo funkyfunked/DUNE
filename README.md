@@ -1,4 +1,6 @@
 
+!TEMPORARY REPOSITORY! 
+
 # Jellyfine - Enhanced Jellyfin Android TV Client
 --------------------------------------------------------------------------------------------------------------------
 
@@ -15,10 +17,12 @@ Jellyfin Android TV is a Jellyfin client for Android TV, Nvidia Shield, and Amaz
 </p>
 
 
+This project is based on the official Jellyfin Android TV client 
+
+
 
 ------------------------------------------------------------------------------------------------------------------------------------
-<h1 align="center">Jellyfin Android TV</h1>
-<h3 align="center">Part of the <a href="https://jellyfin.org">Jellyfin Project</a></h3>
+<h3 align="center">Fork of the <a href="https://jellyfin.org">Jellyfin Project</a></h3>
 
 ---
 
@@ -74,6 +78,8 @@ Look through the following graphic to see if your native language could use some
 <a href="https://translate.jellyfin.org/engage/jellyfin-android/">
 <img alt="Detailed Translation Status" src="https://translate.jellyfin.org/widgets/jellyfin-android/-/jellyfin-androidtv/multi-auto.svg"/>
 </a>
+
+
 
 ## Build Process
 
