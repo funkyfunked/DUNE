@@ -24,7 +24,7 @@ android {
 		applicationId = namespace
 		versionName = project.getVersionName()
 		versionCode = getVersionCode(versionName!!)
-		setProperty("archivesBaseName", "jellyfin-androidtv-v$versionName")
+		setProperty("archivesBaseName", "jellyfin-androidtv-Enhanced-v$versionName")
 	}
 
 	buildFeatures {
@@ -100,7 +100,7 @@ android {
 			resValue("string", "app_search_suggest_intent_data", "content://${applicationId}.content/intent")
 			
 			// Set custom APK filename
-			setProperty("archivesBaseName", "jellyfin-androidtv-v0.18.8-enhanced-release")
+			setProperty("archivesBaseName", "jellyfin-androidtv-Enhanced-v0.18.8")
 		}
 	}
 
@@ -136,7 +136,7 @@ tasks.register("buildEnhanced") {
 		println("Package ID: org.jellyfyn.androidtv.enhanced")
 		println("Version: 0.18.8")
 		println("App Name: Jellyfine")
-		println("Filename: jellyfin-androidtv-v0.18.8-enhanced-release.apk")
+		println("Filename: jellyfin-androidtv-Enhanced-v0.18.8.apk")
 		println("The APK will be available in: app/build/outputs/apk/enhanced/release/")
 	}
 }
