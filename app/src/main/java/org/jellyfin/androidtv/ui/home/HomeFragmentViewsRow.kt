@@ -5,23 +5,14 @@ import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
 import android.view.Gravity
-import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
-import android.widget.TextView
-import androidx.core.content.ContextCompat
-import androidx.leanback.widget.ArrayObjectAdapter
-import androidx.leanback.widget.BaseCardView
+import androidx.appcompat.widget.AppCompatTextView
 import androidx.leanback.widget.HeaderItem
 import androidx.leanback.widget.ListRow
-import androidx.leanback.widget.ListRowPresenter
 import androidx.leanback.widget.Presenter
 import androidx.leanback.widget.Row
-import androidx.leanback.widget.RowPresenter
 import org.jellyfin.androidtv.R
 import org.jellyfin.androidtv.data.querying.GetUserViewsRequest
-import org.jellyfin.androidtv.data.repository.UserViewsRepository
-import org.jellyfin.androidtv.preference.UserPreferences
 import org.jellyfin.androidtv.preference.UserSettingPreferences
 import org.jellyfin.androidtv.ui.itemhandling.BaseRowItem
 import org.jellyfin.androidtv.ui.itemhandling.ItemRowAdapter
@@ -35,14 +26,14 @@ import org.koin.java.KoinJavaComponent
  * instead of the standard card with poster image.
  */
 class ButtonViewPresenter : Presenter() {
-    class ExtraSmallTextView(context: Context) : TextView(context) {
+    class ExtraSmallTextView(context: Context) : AppCompatTextView(context) {
         // Create a drawable once for performance
         private val focusedBackground = GradientDrawable().apply {
             shape = GradientDrawable.RECTANGLE
             cornerRadius = 16f
             setColor(Color.argb(179, 48, 48, 48)) // 70% opacity grey
         }
-        
+
         init {
             // Basic styling
             gravity = Gravity.CENTER
@@ -51,11 +42,11 @@ class ButtonViewPresenter : Presenter() {
             setTypeface(null, Typeface.BOLD)
             setTextColor(Color.WHITE)
         }
-        
+
         // Handle the focus change directly in the view
         override fun onFocusChanged(gainFocus: Boolean, direction: Int, previouslyFocusedRect: android.graphics.Rect?) {
             super.onFocusChanged(gainFocus, direction, previouslyFocusedRect)
-            
+
             // Set background and elevation based on focus state
             if (gainFocus) {
                 background = focusedBackground
@@ -66,21 +57,24 @@ class ButtonViewPresenter : Presenter() {
             }
         }
     }
-    
+
     override fun onCreateViewHolder(parent: ViewGroup): ViewHolder {
         val textView = ExtraSmallTextView(parent.context)
         textView.isFocusable = true
         textView.isFocusableInTouchMode = true
         return ViewHolder(textView)
     }
-    
+
     override fun onBindViewHolder(viewHolder: ViewHolder, item: Any?) {
         if (item !is BaseRowItem) return
-        
+
         val textView = viewHolder.view as ExtraSmallTextView
         textView.text = item.getName(textView.context)
+
+        // Set a tag to identify this as a Media Folders item
+        textView.tag = "media_folders_item"
     }
-    
+
     override fun onUnbindViewHolder(viewHolder: ViewHolder) {
         // Nothing to clean up
     }
@@ -94,6 +88,10 @@ class HomeFragmentViewsRow(
 		val largeCardPresenter = UserViewCardPresenter(false)
 		val buttonPresenter = ButtonViewPresenter()
 	}
+
+    fun isMediaFoldersItem(item: Any?): Boolean {
+        return item is BaseRowItem && item.baseItem?.type == org.jellyfin.sdk.model.api.BaseItemKind.USER_VIEW
+    }
 
 	override fun addToRowsAdapter(context: Context, cardPresenter: CardPresenter, rowsAdapter: MutableObjectAdapter<Row>) {
 		// Get user preferences to check if extra small option is enabled

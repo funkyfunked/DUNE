@@ -2,7 +2,6 @@ package org.jellyfin.androidtv.ui.playback.overlay;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -12,7 +11,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.leanback.media.PlaybackTransportControlGlue;
 
 import org.jellyfin.androidtv.R;
 import org.jellyfin.androidtv.ui.playback.PlaybackController;
@@ -49,11 +47,11 @@ public class CustomPlaybackOverlayFragment extends Fragment implements PlaybackG
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.playback_controls, container, false);
-        
+
         initializeViews(view);
         setupListeners();
         updatePlayPauseButton();
-        
+
         return view;
     }
 
@@ -77,7 +75,7 @@ public class CustomPlaybackOverlayFragment extends Fragment implements PlaybackG
         nextButton.setOnClickListener(v -> playbackController.next());
         rewindButton.setOnClickListener(v -> playbackController.rewind());
         forwardButton.setOnClickListener(v -> playbackController.fastForward());
-        
+
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -137,30 +135,34 @@ public class CustomPlaybackOverlayFragment extends Fragment implements PlaybackG
     }
 
     public void showControls() {
-        if (!isControlsVisible) {
+        if (!isControlsVisible && getView() != null) {
             isControlsVisible = true;
-            getView().setVisibility(View.VISIBLE);
-            getView().animate()
-                .alpha(1f)
-                .setDuration(300)
-                .start();
+            View view = getView();
+            view.animate().cancel();
+            view.setVisibility(View.VISIBLE);
+            view.setAlpha(1f);
         }
     }
 
     public void hideControls() {
-        if (isControlsVisible) {
+        if (isControlsVisible && getView() != null) {
             isControlsVisible = false;
-            getView().animate()
-                .alpha(0f)
-                .setDuration(300)
-                .withEndAction(() -> getView().setVisibility(View.GONE))
-                .start();
+            View view = getView();
+            view.animate().cancel();
+            view.setVisibility(View.GONE);
+            view.setAlpha(0f);
         }
     }
 
     public void hideControlsDelayed() {
-        getView().postDelayed(this::hideControls, 3000);
+        View view = getView();
+        if (view != null) {
+            view.removeCallbacks(hideControlsRunnable);
+            view.postDelayed(hideControlsRunnable, 3000);
+        }
     }
+    
+    private final Runnable hideControlsRunnable = this::hideControls;
 
     public void setFadingEnabled(boolean enabled) {
         isFadingEnabled = enabled;
@@ -170,7 +172,7 @@ public class CustomPlaybackOverlayFragment extends Fragment implements PlaybackG
         long seconds = milliseconds / 1000;
         long minutes = seconds / 60;
         long hours = minutes / 60;
-        
+
         if (hours > 0) {
             return String.format("%d:%02d:%02d", hours, minutes % 60, seconds % 60);
         } else {
@@ -209,4 +211,4 @@ public class CustomPlaybackOverlayFragment extends Fragment implements PlaybackG
             updatePlayPauseButton();
         }
     }
-} 
+}

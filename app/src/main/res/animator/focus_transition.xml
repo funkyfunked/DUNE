@@ -1,47 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_focused="true">
-        <set>
+        <set
+            android:ordering="together">
+            <!-- Simplified focus transition to improve performance -->
             <objectAnimator
-                android:duration="75"
-                android:interpolator="@android:interpolator/fast_out_linear_in"
+                android:duration="0"
                 android:propertyName="scaleX"
-                android:valueTo="1.04"
-                android:valueType="floatType" />
+                android:valueTo="1.0"
+                android:valueType="floatType"
+                android:interpolator="@android:interpolator/linear" />
             <objectAnimator
-                android:duration="75"
-                android:interpolator="@android:interpolator/fast_out_linear_in"
+                android:duration="0"
                 android:propertyName="scaleY"
-                android:valueTo="1.04"
-                android:valueType="floatType" />
-            <objectAnimator
-                android:duration="75"
-                android:interpolator="@android:interpolator/fast_out_linear_in"
-                android:propertyName="translationZ"
-                android:valueTo="6dp"
-                android:valueType="floatType" />
+                android:valueTo="1.0"
+                android:valueType="floatType"
+                android:interpolator="@android:interpolator/linear" />
         </set>
     </item>
     <item>
-        <set>
+        <set
+            android:ordering="together">
+            <!-- Simplified focus transition to improve performance -->
             <objectAnimator
-                android:duration="75"
-                android:interpolator="@android:interpolator/linear_out_slow_in"
+                android:duration="0"
                 android:propertyName="scaleX"
                 android:valueTo="1.0"
-                android:valueType="floatType" />
+                android:valueType="floatType"
+                android:interpolator="@android:interpolator/linear" />
             <objectAnimator
-                android:duration="75"
-                android:interpolator="@android:interpolator/linear_out_slow_in"
+                android:duration="0"
                 android:propertyName="scaleY"
                 android:valueTo="1.0"
-                android:valueType="floatType" />
-            <objectAnimator
-                android:duration="75"
-                android:interpolator="@android:interpolator/linear_out_slow_in"
-                android:propertyName="translationZ"
-                android:valueTo="0dp"
-                android:valueType="floatType" />
+                android:valueType="floatType"
+                android:interpolator="@android:interpolator/linear" />
         </set>
     </item>
 </selector>

@@ -713,13 +713,14 @@ public class BrowseGridFragment extends Fragment implements View.OnKeyListener {
     }
 
     private void addTools() {
-        //Add tools
-        int size = Utils.convertDpToPixel(requireContext(), 26);
+        //Add tools - Increased icon size by 5% (27.3dp rounded to 27)
+        int size = Utils.convertDpToPixel(requireContext(), 27);
 
         mSortButton = new ImageButton(requireContext(), null, 0, R.style.Button_Icon);
         mSortButton.setImageResource(R.drawable.ic_sort);
         mSortButton.setMaxHeight(size);
         mSortButton.setAdjustViewBounds(true);
+        // Removed scaling as we're setting the exact size
         mSortButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -753,6 +754,7 @@ public class BrowseGridFragment extends Fragment implements View.OnKeyListener {
             mUnwatchedButton.setActivated(mAdapter.getFilters().isUnwatchedOnly());
             mUnwatchedButton.setMaxHeight(size);
             mUnwatchedButton.setAdjustViewBounds(true);
+            // Removed scaling as we're setting the exact size
             mUnwatchedButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -775,6 +777,7 @@ public class BrowseGridFragment extends Fragment implements View.OnKeyListener {
         mFavoriteButton.setActivated(mAdapter.getFilters().isFavoriteOnly());
         mFavoriteButton.setMaxHeight(size);
         mFavoriteButton.setAdjustViewBounds(true);
+        // Removed scaling as we're setting the exact size
         mFavoriteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -796,6 +799,7 @@ public class BrowseGridFragment extends Fragment implements View.OnKeyListener {
         mLetterButton.setImageResource(R.drawable.ic_jump_letter);
         mLetterButton.setMaxHeight(size);
         mLetterButton.setAdjustViewBounds(true);
+        // Removed scaling as we're setting the exact size
         mLetterButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -810,6 +814,7 @@ public class BrowseGridFragment extends Fragment implements View.OnKeyListener {
         mSettingsButton.setImageResource(R.drawable.ic_settings);
         mSettingsButton.setMaxHeight(size);
         mSettingsButton.setAdjustViewBounds(true);
+        // Removed scaling as we're setting the exact size
         mSettingsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

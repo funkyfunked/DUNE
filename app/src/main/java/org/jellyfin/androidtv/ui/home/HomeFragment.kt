@@ -2,39 +2,31 @@ package org.jellyfin.androidtv.ui.home
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import androidx.viewpager2.widget.ViewPager2
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.jellyfin.androidtv.R
 import org.jellyfin.androidtv.auth.repository.ServerRepository
 import org.jellyfin.androidtv.auth.repository.SessionRepository
 import org.jellyfin.androidtv.auth.repository.UserRepository
-import org.jellyfin.androidtv.data.repository.ItemRepository
 import org.jellyfin.androidtv.data.repository.NotificationsRepository
 import org.jellyfin.androidtv.databinding.FragmentHomeBinding
-import org.jellyfin.androidtv.ui.navigation.ActivityDestinations
+import org.jellyfin.androidtv.preference.UserSettingPreferences
 import org.jellyfin.androidtv.ui.navigation.Destinations
 import org.jellyfin.androidtv.ui.navigation.NavigationRepository
 import org.jellyfin.androidtv.ui.playback.MediaManager
 import org.jellyfin.androidtv.ui.playback.PlaybackLauncher
-import timber.log.Timber
 import org.jellyfin.androidtv.ui.startup.StartupActivity
 import org.jellyfin.androidtv.util.ImageHelper
-import org.koin.android.ext.android.inject
-import org.jellyfin.sdk.model.api.request.GetLatestMediaRequest
-import org.jellyfin.sdk.model.api.BaseItemKind
-
 import org.jellyfin.sdk.api.client.ApiClient
-import org.jellyfin.sdk.api.client.extensions.userLibraryApi
 import org.jellyfin.sdk.api.client.extensions.liveTvApi
+import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.UUID
 
 class HomeFragment : Fragment() {
@@ -43,6 +35,8 @@ class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
 
+
+
     private val sessionRepository by inject<SessionRepository>()
     private val userRepository by inject<UserRepository>()
     private val serverRepository by inject<ServerRepository>()
@@ -50,29 +44,44 @@ class HomeFragment : Fragment() {
     private val navigationRepository by inject<NavigationRepository>()
     private val mediaManager by inject<MediaManager>()
     private val playbackLauncher: PlaybackLauncher by inject()
+    private val userSettingPreferences: UserSettingPreferences by inject()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         return binding.root
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Reset any necessary state here
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         binding.toolbar.setContent {
-            val searchAction = { 
+            val searchAction = {
                 // Navigate to search screen
                 navigationRepository.navigate(Destinations.search())
             }
-            val settingsAction = { 
+            val settingsAction = {
                 // Open preferences/settings activity
                 val intent = Intent(requireContext(), org.jellyfin.androidtv.ui.preference.PreferencesActivity::class.java)
                 startActivity(intent)
             }
-            val switchUsersAction = { 
+            val switchUsersAction = {
                 switchUser()
             }
-            
+
             val liveTvAction = {
     val lastChannelId = org.jellyfin.androidtv.ui.livetv.TvManager.getLastLiveTvChannel()
     if (lastChannelId != null) {
@@ -92,11 +101,17 @@ class HomeFragment : Fragment() {
         navigationRepository.navigate(Destinations.liveTvGuide)
     }
 }
+            val libraryAction = {
+                // Navigate to the home screen which shows the library content
+                navigationRepository.navigate(Destinations.home)
+            }
             org.jellyfin.androidtv.ui.shared.toolbar.HomeToolbar(
                 openSearch = { searchAction() },
                 openLiveTv = { liveTvAction() },
                 openSettings = { settingsAction() },
-                switchUsers = { switchUsersAction() }
+                switchUsers = { switchUsersAction() },
+                openLibrary = { libraryAction() },
+                userSettingPreferences = userSettingPreferences
             )
         }
     }

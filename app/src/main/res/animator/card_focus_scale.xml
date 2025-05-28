@@ -1,35 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:state_focused="true">
-        <set>
-            <objectAnimator
-                android:duration="75"
-                android:interpolator="@android:interpolator/fast_out_linear_in"
-                android:propertyName="scaleX"
-                android:valueTo="1.02"
-                android:valueType="floatType" />
-            <objectAnimator
-                android:duration="75"
-                android:interpolator="@android:interpolator/fast_out_linear_in"
-                android:propertyName="scaleY"
-                android:valueTo="1.02"
-                android:valueType="floatType" />
-        </set>
-    </item>
     <item>
-        <set>
+        <set android:ordering="together">
+            <!-- Disabled focus scale animation for better performance -->
             <objectAnimator
-                android:duration="150"
-                android:interpolator="@android:interpolator/linear_out_slow_in"
+                android:duration="0"
                 android:propertyName="scaleX"
                 android:valueTo="1.0"
-                android:valueType="floatType" />
+                android:valueType="floatType"
+                android:interpolator="@android:interpolator/linear" />
             <objectAnimator
-                android:duration="150"
-                android:interpolator="@android:interpolator/linear_out_slow_in"
+                android:duration="0"
                 android:propertyName="scaleY"
                 android:valueTo="1.0"
-                android:valueType="floatType" />
+                android:valueType="floatType"
+                android:interpolator="@android:interpolator/linear" />
         </set>
     </item>
 </selector>

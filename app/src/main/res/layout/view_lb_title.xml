@@ -32,16 +32,6 @@
                 android:visibility="invisible"
                 tools:ignore="UnusedAttribute" />
 
-            <ImageButton
-                android:id="@+id/btn_live_tv"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_tv"
-                android:contentDescription="@string/lbl_live_tv"
-                android:tint="@color/button_text"
-                android:layout_marginStart="8dp" />
-
             <org.jellyfin.androidtv.ui.ClockUserView
                 android:id="@+id/toolbar_actions"
                 android:layout_width="wrap_content"

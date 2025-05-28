@@ -63,6 +63,7 @@ class UserSettingPreferences(context: Context) : SharedPreferenceStore(
 
     // Media folder display options
     val useExtraSmallMediaFolders = booleanPreference("useExtraSmallMediaFolders", false)
+    val showLiveTvButton = booleanPreference("show_live_tv_button", true)
 
     val homesection0 = enumPreference("homesection0", HomeSectionType.LIBRARY_TILES_SMALL)
     val homesection1 = enumPreference("homesection1", HomeSectionType.RESUME)

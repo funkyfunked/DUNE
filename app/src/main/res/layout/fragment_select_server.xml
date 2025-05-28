@@ -35,19 +35,13 @@
             tools:listitem="@layout/view_button_server" />
 
         <TextView
-            android:id="@+id/welcome_title"
-            style="@style/Widget.Jellyfin.Row.Header"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/welcome_title" />
-
-        <TextView
             android:id="@+id/welcome_content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
-            android:text="@string/welcome_content" />
+            android:text="@string/welcome_content"
+            android:visibility="invisible" />
 
         <TextView
             android:id="@+id/app_version"
@@ -56,6 +50,7 @@
             android:layout_marginTop="8dp"
             android:gravity="center"
             android:textAppearance="?android:attr/textAppearanceSmall"
+            android:visibility="invisible"
             tools:text="jellyfin-androidtv 1.0.0 debug" />
 
         <Button

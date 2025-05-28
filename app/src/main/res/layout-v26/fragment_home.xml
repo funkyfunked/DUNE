@@ -12,50 +12,81 @@
         android:layout_height="wrap_content" />
 
     <!-- Info Panel (Title, Info Row, Summary) -->
-
     <TextView
         android:id="@+id/title"
-        android:layout_width="536dp"
-        android:layout_height="31dp"
+        android:layout_width="570sp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="50sp"
-        android:layout_marginTop="20sp"
+        android:layout_marginTop="16sp"
         android:ellipsize="end"
         android:fontFamily="@font/roboto_bold_family"
+        android:letterSpacing="0.02"
+        android:lineSpacingExtra="2sp"
         android:maxLines="1"
         android:text=""
-        android:textSize="14.4sp" />
-
-    <!-- Extra spacing below info panel -->
+        android:textSize="20sp" />
 
     <LinearLayout
         android:id="@+id/infoRow"
-        android:layout_width="492dp"
-        android:layout_height="25dp"
+        android:layout_width="570sp"
+        android:layout_height="15.5sp"
         android:layout_marginStart="50sp"
-        android:layout_marginTop="1.8sp"
+        android:layout_marginTop="8sp"
         android:layout_toStartOf="@id/title"
-        android:baselineAligned="false"
         android:orientation="horizontal" />
 
     <TextView
         android:id="@+id/summary"
-        android:layout_width="434dp"
-        android:layout_height="78dp"
+        android:layout_width="453dp"
+        android:layout_height="69sp"
         android:layout_marginStart="50sp"
         android:layout_marginTop="10sp"
         android:layout_marginBottom="10.8dp"
         android:ellipsize="end"
         android:fontFamily="sans-serif-light"
+        android:lineSpacingExtra="0.5sp"
         android:maxLines="4"
         android:text=""
         android:textSize="13.8sp"
         android:textStyle="bold" />
 
+    <!-- Extra spacing below info panel -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="6dp" />
+
+    <!-- Row Header Dock -->
+    <androidx.leanback.widget.NonOverlappingLinearLayout
+        android:id="@+id/row_header_dock"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        style="?attr/rowHeaderDockStyle"
+        android:clipToPadding="false"
+        android:visibility="gone"
+        android:paddingStart="50sp"
+        android:paddingEnd="16dp"
+        android:gravity="center_vertical"
+        android:minHeight="?android:attr/listPreferredItemHeight">
+
+        <TextView
+            android:id="@+id/row_header_title"
+            style="?android:attr/textAppearanceMedium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:textColor="@android:color/white"
+            android:textStyle="bold"
+            tools:text="Row Title" />
+
+    </androidx.leanback.widget.NonOverlappingLinearLayout>
+
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/content_view"
         android:name="org.jellyfin.androidtv.ui.home.HomeRowsFragment"
         android:layout_width="match_parent"
-        android:layout_height="527dp"
+        android:layout_height="0dp"
         android:layout_weight="1"
         android:contentDescription="@string/home_content_description"
         android:descendantFocusability="afterDescendants"

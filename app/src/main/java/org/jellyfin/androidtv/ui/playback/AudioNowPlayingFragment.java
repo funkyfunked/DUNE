@@ -219,6 +219,7 @@ public class AudioNowPlayingFragment extends Fragment {
 
         mRowsFragment.setOnItemViewClickedListener(new ItemViewClickedListener());
         mRowsFragment.setOnItemViewSelectedListener(new ItemViewSelectedListener());
+        // Use default padding (10dp as per original code)
         mAudioQueuePresenter = new PositionableListRowPresenter(10);
         mRowsAdapter = new ArrayObjectAdapter(mAudioQueuePresenter);
         mRowsFragment.setAdapter(mRowsAdapter);

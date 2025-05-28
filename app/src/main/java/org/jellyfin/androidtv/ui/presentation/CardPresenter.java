@@ -5,6 +5,7 @@ import android.graphics.drawable.Drawable;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
+import static android.view.View.FOCUS_DOWN;
 import android.widget.ImageView;
 
 import androidx.annotation.ColorInt;
@@ -18,19 +19,18 @@ import org.jellyfin.androidtv.constant.ImageType;
 import org.jellyfin.androidtv.preference.UserPreferences;
 import org.jellyfin.androidtv.preference.constant.RatingType;
 import org.jellyfin.androidtv.preference.constant.WatchedIndicatorBehavior;
-import org.koin.java.KoinJavaComponent;
 import org.jellyfin.androidtv.ui.card.LegacyImageCardView;
 import org.jellyfin.androidtv.ui.itemhandling.AudioQueueBaseRowItem;
 import org.jellyfin.androidtv.ui.itemhandling.BaseItemDtoBaseRowItem;
 import org.jellyfin.androidtv.ui.itemhandling.BaseRowItem;
 import org.jellyfin.androidtv.util.ImageHelper;
-import org.jellyfin.androidtv.util.TimeUtils;
 import org.jellyfin.androidtv.util.Utils;
 import org.jellyfin.androidtv.util.apiclient.JellyfinImage;
 import org.jellyfin.androidtv.util.apiclient.JellyfinImageKt;
 import org.jellyfin.sdk.model.api.BaseItemDto;
 import org.jellyfin.sdk.model.api.BaseItemKind;
 import org.jellyfin.sdk.model.api.UserItemDataDto;
+import org.koin.java.KoinJavaComponent;
 
 import java.time.LocalDateTime;
 import java.util.Locale;
@@ -44,6 +44,7 @@ public class CardPresenter extends Presenter {
     private boolean mShowInfo = true;
     private boolean isUserView = false;
     private boolean isUniformAspect = false;
+    private boolean isHomeScreen = false;
     private final Lazy<ImageHelper> imageHelper = KoinJavaComponent.<ImageHelper>inject(ImageHelper.class);
 
     public CardPresenter() {
@@ -64,18 +65,14 @@ public class CardPresenter extends Presenter {
         this(showInfo);
         mStaticHeight = staticHeight;
     }
+    
+    public void setHomeScreen(boolean isHomeScreen) {
+        this.isHomeScreen = isHomeScreen;
+    }
 
     class ViewHolder extends Presenter.ViewHolder {
-        // Base dimensions
-        private static final int BASE_CARD_WIDTH = 115;
-        private static final int BASE_CARD_HEIGHT = 140;
-        
-        // Size multipliers
-        private static final float SMALL_SIZE_MULTIPLIER = 0.8f;
-        private static final float MEDIUM_SIZE_MULTIPLIER = 0.9f;
-        private static final float LARGE_SIZE_MULTIPLIER = 1.2f;
-        
-        // Card dimensions will be calculated dynamically based on preference
+        private int cardWidth = 104; // 115 * 0.9
+        private int cardHeight = 126; // 140 * 0.9
 
         private BaseRowItem mItem;
         private LegacyImageCardView mCardView;
@@ -89,33 +86,11 @@ public class CardPresenter extends Presenter {
         }
 
         public int getCardWidth() {
-            // Get card size preference and apply multiplier
-            UserPreferences userPreferences = KoinJavaComponent.get(UserPreferences.class);
-            String cardSize = userPreferences.get(UserPreferences.Companion.getCardSize());
-            
-            float multiplier = MEDIUM_SIZE_MULTIPLIER; // Default to medium
-            if ("small".equals(cardSize)) {
-                multiplier = SMALL_SIZE_MULTIPLIER;
-            } else if ("large".equals(cardSize)) {
-                multiplier = LARGE_SIZE_MULTIPLIER;
-            }
-            
-            return Math.round(BASE_CARD_WIDTH * multiplier);
+            return cardWidth;
         }
 
         public int getCardHeight() {
-            // Get card size preference and apply multiplier
-            UserPreferences userPreferences = KoinJavaComponent.get(UserPreferences.class);
-            String cardSize = userPreferences.get(UserPreferences.Companion.getCardSize());
-            
-            float multiplier = MEDIUM_SIZE_MULTIPLIER; // Default to medium
-            if ("small".equals(cardSize)) {
-                multiplier = SMALL_SIZE_MULTIPLIER;
-            } else if ("large".equals(cardSize)) {
-                multiplier = LARGE_SIZE_MULTIPLIER;
-            }
-            
-            return Math.round(BASE_CARD_HEIGHT * multiplier);
+            return cardHeight;
         }
 
         public void setItem(BaseRowItem m) {
@@ -174,6 +149,14 @@ public class CardPresenter extends Presenter {
                             } else {
                                 mDefaultCardImage = ContextCompat.getDrawable(mCardView.getContext(), R.drawable.tile_land_tv);
                                 aspect = ImageHelper.ASPECT_RATIO_16_9;
+                                // Reduce size by 10% for home screen
+                                cardWidth = (int)(cardWidth * 0.9);
+                                cardHeight = (int)(cardHeight * 0.9);
+                                if (isHomeScreen) {
+                                    lHeight = (int)(lHeight * 0.8);
+                                    pHeight = (int)(pHeight * 0.8);
+                                    sHeight = (int)(sHeight * 0.8);
+                                }
                                 if (itemDto.getLocationType() != null) {
                                     switch (itemDto.getLocationType()) {
                                         case FILE_SYSTEM:
@@ -225,25 +208,11 @@ public class CardPresenter extends Presenter {
                                 aspect = ImageHelper.ASPECT_RATIO_2_3;
                             break;
                     }
-                    int baseCardHeight = !m.getStaticHeight() ? (aspect > 1 ? lHeight : pHeight) : sHeight;
-                    int baseCardWidth = (int) (aspect * baseCardHeight);
-                    if (baseCardWidth < 5) {
-                        baseCardWidth = 115;  //Guard against zero size images causing picasso to barf
+                    cardHeight = !m.getStaticHeight() ? (aspect > 1 ? lHeight : pHeight) : sHeight;
+                    cardWidth = (int) (aspect * cardHeight);
+                    if (cardWidth < 5) {
+                        cardWidth = 115;  //Guard against zero size images causing picasso to barf
                     }
-                    
-                    // Apply size preference scaling
-                    UserPreferences userPreferences = KoinJavaComponent.get(UserPreferences.class);
-                    String cardSize = userPreferences.get(UserPreferences.Companion.getCardSize());
-                    
-                    float multiplier = MEDIUM_SIZE_MULTIPLIER; // Default to medium
-                    if ("small".equals(cardSize)) {
-                        multiplier = SMALL_SIZE_MULTIPLIER;
-                    } else if ("large".equals(cardSize)) {
-                        multiplier = LARGE_SIZE_MULTIPLIER;
-                    }
-                    
-                    int cardWidth = Math.round(baseCardWidth * multiplier);
-                    int cardHeight = Math.round(baseCardHeight * multiplier);
                     if (Utils.isTrue(itemDto.isPlaceHolder())) {
                         mCardView.setBanner(R.drawable.banner_edge_disc);
                     }
@@ -389,6 +358,63 @@ public class CardPresenter extends Presenter {
         ViewHolder holder = (ViewHolder) viewHolder;
         holder.setItem(rowItem, mImageType, 130, 150, mStaticHeight);
 
+        if (holder.mCardView != null) {
+            holder.mCardView.setFocusable(true);
+            holder.mCardView.setFocusableInTouchMode(true);
+            // Remove elevation and shadow effects but keep the white border on focus
+            holder.mCardView.setElevation(0);
+            holder.mCardView.setSelected(false);
+            // Set up focus handling with minimal elevation and white border
+            holder.mCardView.setFocusable(true);
+            holder.mCardView.setFocusableInTouchMode(true);
+            holder.mCardView.setSelected(false);
+            
+            // Set minimum possible elevation (0.1dp)
+            final float minElevation = TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP, 
+                0.1f, 
+                holder.mCardView.getContext().getResources().getDisplayMetrics()
+            );
+            
+            // Set up a focus change listener to handle the border and elevation
+            holder.mCardView.setOnFocusChangeListener((v, hasFocus) -> {
+                v.setSelected(hasFocus);
+                
+                // Apply minimal elevation when focused
+                if (hasFocus) {
+                    v.setElevation(minElevation);
+                    v.setTranslationZ(minElevation);
+                } else {
+                    v.setElevation(0);
+                    v.setTranslationZ(0);
+                }
+                
+                // Manually set the foreground drawable for the border with API level check
+                View mainImage = v.findViewById(R.id.main_image);
+                if (mainImage != null) {
+                    if (hasFocus) {
+                        // Get the border drawable from resources
+                        Drawable border = ContextCompat.getDrawable(
+                            v.getContext(), 
+                            R.drawable.card_focused_border
+                        );
+                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                            mainImage.setForeground(border);
+                        } else {
+                            // For API < 23, set the background instead (with padding to avoid covering content)
+                            mainImage.setBackground(border);
+                        }
+                    } else {
+                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                            mainImage.setForeground(null);
+                        } else {
+                            mainImage.setBackground(null);
+                        }
+                    }
+                }
+            });
+        }
+
         holder.mCardView.setTitleText(rowItem.getCardName(holder.mCardView.getContext()));
         holder.mCardView.setContentText(rowItem.getSubText(holder.mCardView.getContext()));
         if (ImageType.POSTER.equals(mImageType)) {
@@ -433,17 +459,8 @@ public class CardPresenter extends Presenter {
             }
         }
 
-        // Fetch image quality preference
-        UserPreferences userPreferences = KoinJavaComponent.get(UserPreferences.class);
-        String imageQuality = userPreferences.get(UserPreferences.Companion.getImageQuality());
-        float qualityMultiplier = 1.0f;
-        if ("low".equals(imageQuality)) {
-            qualityMultiplier = 0.5f;
-        } else if ("high".equals(imageQuality)) {
-            qualityMultiplier = 2.0f;
-        }
-        int fillWidth = Math.round(holder.getCardWidth() * holder.mCardView.getResources().getDisplayMetrics().density * qualityMultiplier);
-        int fillHeight = Math.round(holder.getCardHeight() * holder.mCardView.getResources().getDisplayMetrics().density * qualityMultiplier);
+        int fillWidth = Math.round(holder.getCardWidth() * holder.mCardView.getResources().getDisplayMetrics().density);
+        int fillHeight = Math.round(holder.getCardHeight() * holder.mCardView.getResources().getDisplayMetrics().density);
 
         holder.updateCardViewImage(
                 image == null ? rowItem.getImageUrl(holder.mCardView.getContext(), imageHelper.getValue(), mImageType, fillWidth, fillHeight) : imageHelper.getValue().getImageUrl(image),

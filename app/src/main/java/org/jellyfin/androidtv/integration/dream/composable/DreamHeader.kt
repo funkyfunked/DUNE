@@ -3,6 +3,10 @@ package org.jellyfin.androidtv.integration.dream.composable
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -25,7 +29,6 @@ import org.jellyfin.androidtv.ui.composable.rememberCurrentTime
 
 @Composable
 fun DreamHeader(
-	showLogo: Boolean,
 	showClock: Boolean,
 ) {
 	Row(
@@ -34,18 +37,7 @@ fun DreamHeader(
 			.fillMaxWidth()
 			.overscan(),
 	) {
-		// Logo
-		AnimatedVisibility(
-			visible = showLogo,
-			enter = fadeIn(),
-			exit = fadeOut(),
-			modifier = Modifier.height(41.dp),
-		) {
-			Image(
-				painter = painterResource(R.drawable.app_logo),
-				contentDescription = stringResource(R.string.app_name),
-			)
-		}
+		Spacer(modifier = Modifier.height(16.dp))
 
 		Spacer(
 			modifier = Modifier

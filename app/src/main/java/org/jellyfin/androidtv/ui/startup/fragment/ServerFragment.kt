@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.PopupMenu
+import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
@@ -38,13 +40,12 @@ import org.jellyfin.androidtv.auth.repository.ServerUserRepository
 import org.jellyfin.androidtv.data.service.BackgroundService
 import org.jellyfin.androidtv.databinding.FragmentServerBinding
 import org.jellyfin.androidtv.ui.ServerButtonView
-import org.jellyfin.androidtv.ui.card.DefaultCardView
 import org.jellyfin.androidtv.ui.startup.StartupViewModel
-import org.jellyfin.androidtv.util.ListAdapter
 import org.jellyfin.androidtv.util.MarkdownRenderer
 import org.jellyfin.sdk.model.serializer.toUUIDOrNull
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
+import timber.log.Timber
 
 class ServerFragment : Fragment() {
 	companion object {
@@ -104,7 +105,7 @@ class ServerFragment : Fragment() {
 		startupViewModel.users
 			.flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
 			.onEach { users ->
-				userAdapter.items = users
+				userAdapter.updateItems(users)
 
 				binding.users.isFocusable = users.any()
 				binding.noUsersWarning.isVisible = users.isEmpty()
@@ -199,56 +200,106 @@ class ServerFragment : Fragment() {
 		else navigateFragment<SelectServerFragment>(keepToolbar = true)
 	}
 
-	private class UserAdapter(
+	private inner class UserAdapter(
 		private val context: Context,
 		private val server: Server,
 		private val startupViewModel: StartupViewModel,
 		private val authenticationRepository: AuthenticationRepository,
 		private val serverUserRepository: ServerUserRepository,
-	) : ListAdapter<User, UserAdapter.ViewHolder>() {
+	) : RecyclerView.Adapter<UserAdapter.ViewHolder>() {
+		private var items: List<User> = emptyList()
 		var onItemPressed: (User) -> Unit = {}
 
-		override fun areItemsTheSame(old: User, new: User): Boolean = old.id == new.id
+		fun updateItems(newItems: List<User>) {
+			items = newItems
+			notifyDataSetChanged()
+		}
+
+		override fun getItemCount(): Int = items.size
+
+		private fun getItem(position: Int): User = items[position]
 
 		override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-			val cardView = DefaultCardView(context).apply {
-				setSize(DefaultCardView.Size.SQUARE)
+			val view = LayoutInflater.from(parent.context).inflate(R.layout.view_circular_user_profile, parent, false)
+			return ViewHolder(view).apply {
+				itemView.setOnClickListener {
+					val position = bindingAdapterPosition
+					if (position != RecyclerView.NO_POSITION) {
+						onItemPressed(getItem(position))
+					}
+				}
+				itemView.setOnLongClickListener {
+					val position = bindingAdapterPosition
+					if (position != RecyclerView.NO_POSITION) {
+						showUserMenu(it, getItem(position))
+					}
+					true
+				}
 			}
-
-			return ViewHolder(cardView)
 		}
 
-		override fun onBindViewHolder(holder: ViewHolder, user: User) {
-			// holder.cardView.title = user.name // Removed: no title property
-			holder.cardView.setImage(
-				url = startupViewModel.getUserImage(server, user),
-				placeholder = ContextCompat.getDrawable(context, R.drawable.tile_user)
+		private fun showUserMenu(view: View, user: User) {
+			val popup = PopupMenu(view.context, view)
+			val menu = popup.menu
+
+			// Logout button
+			if (user is PrivateUser && user.accessToken != null) {
+				menu.add(0, View.generateViewId(), 0, R.string.lbl_sign_out).setOnMenuItemClickListener {
+					authenticationRepository.logout(user)
+					true
+				}
+			}
+
+			// Remove button
+			if (user is PrivateUser) {
+				menu.add(0, View.generateViewId(), 0, R.string.lbl_remove).setOnMenuItemClickListener {
+					serverUserRepository.deleteStoredUser(user)
+					startupViewModel.loadUsers(server)
+					true
+				}
+			}
+
+			popup.show()
+		}
+
+		override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+			val item = getItem(position)
+			// Set user image
+			val imageView = holder.itemView.findViewById<org.jellyfin.androidtv.ui.AsyncImageView>(R.id.profile_image)
+			val placeholder = ContextCompat.getDrawable(context, R.drawable.tile_user)
+
+			imageView.load(
+				url = startupViewModel.getUserImage(server, item),
+				placeholder = placeholder,
+				aspectRatio = 1.0
 			)
-			holder.cardView.setPopupMenu {
-				// Logout button
-				if (user is PrivateUser && user.accessToken != null) {
-					item(context.getString(R.string.lbl_sign_out)) {
-						authenticationRepository.logout(user)
+
+			// Set username text
+			val nameView = holder.itemView.findViewById<TextView>(R.id.name)
+			Timber.d("Setting username to: %s", item.name)
+			nameView.text = item.name
+			nameView.visibility = View.VISIBLE
+			Timber.d("NameView visibility: %s, text: %s", nameView.visibility, nameView.text)
+
+			// Handle focus changes with animation
+			holder.itemView.setOnFocusChangeListener { view, hasFocus ->
+				view.animate()
+					.scaleX(if (hasFocus) 1.05f else 1.0f)
+					.scaleY(if (hasFocus) 1.05f else 1.0f)
+					.translationZ(if (hasFocus) 8.8f else 0f)
+					.setDuration(200)
+					.start()
+
+				if (hasFocus) {
+					// Scroll to the focused position
+					view.post {
+						val recyclerView = view.parent as? RecyclerView
+						recyclerView?.smoothScrollToPosition(holder.bindingAdapterPosition)
 					}
 				}
-
-				// Remove button
-				if (user is PrivateUser) {
-					item(context.getString(R.string.lbl_remove)) {
-						serverUserRepository.deleteStoredUser(user)
-						startupViewModel.loadUsers(server)
-					}
-				}
-			}
-
-			holder.cardView.setOnClickListener {
-				onItemPressed(user)
 			}
 		}
 
-		private class ViewHolder(
-			val cardView: DefaultCardView,
-		) : RecyclerView.ViewHolder(cardView)
+		inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 	}
 }
-

@@ -72,31 +72,42 @@ class DefaultCardView @JvmOverloads constructor(
 		return false
 	}
 
+	private var currentScale: Float = 0.95f
+	private var isFocused: Boolean = false
+
 	override fun onFocusChanged(gainFocus: Boolean, direction: Int, previouslyFocusedRect: Rect?) {
-    super.onFocusChanged(gainFocus, direction, previouslyFocusedRect)
+		super.onFocusChanged(gainFocus, direction, previouslyFocusedRect)
+		
+		// Skip if focus state hasn't changed
+		if (isFocused == gainFocus) return
+		isFocused = gainFocus
+		
+		// Cancel any ongoing animations
+		animate().cancel()
 
-    val scaleRes = if (gainFocus) R.fraction.card_scale_focus else R.fraction.card_scale_default
-    val scale = resources.getFraction(scaleRes, 1, 1)
-
-    // Show/hide white border overlay if enabled in preferences
-    val prefs = org.jellyfin.androidtv.preference.UserPreferences(context)
-    val showWhiteBorders = prefs[org.jellyfin.androidtv.preference.UserPreferences.showWhiteBorders]
-    if (gainFocus && showWhiteBorders) {
-        foreground = context.getDrawable(R.drawable.card_focused_border)
-    } else {
-        foreground = null
-    }
-
-    post {
-        animate().apply {
-            scaleX(scale)
-            scaleY(scale)
-            duration = 75
-            withLayer()
-        }
-    }
-}
-
+		// Use a simpler scale factor to reduce rendering load
+		val targetScale = if (gainFocus) 1.0f else 0.95f
+		
+		// Only update if scale has changed
+		if (currentScale != targetScale) {
+			currentScale = targetScale
+			scaleX = targetScale
+			scaleY = targetScale
+		}
+		
+		// Show/hide white border overlay if enabled in preferences
+		val prefs = org.jellyfin.androidtv.preference.UserPreferences(context)
+		val showWhiteBorders = prefs[org.jellyfin.androidtv.preference.UserPreferences.showWhiteBorders]
+		
+		// Only update foreground if needed
+		if (gainFocus && showWhiteBorders) {
+			if (foreground == null) {
+				foreground = context.getDrawable(R.drawable.card_focused_border)
+			}
+		} else {
+			foreground = null
+		}
+	}
 
 	@Suppress("MagicNumber")
 	enum class Size(val width: Int, val height: Int) {

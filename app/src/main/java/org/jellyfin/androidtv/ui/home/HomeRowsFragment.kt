@@ -1,6 +1,7 @@
 package org.jellyfin.androidtv.ui.home
 
 import org.jellyfin.androidtv.R
+import org.jellyfin.androidtv.ui.home.HomeFragmentViewsRow
 
 import android.os.Bundle
 import android.view.KeyEvent
@@ -50,6 +51,7 @@ import org.jellyfin.androidtv.ui.playback.MediaManager
 import org.jellyfin.androidtv.ui.presentation.CardPresenter
 import org.jellyfin.androidtv.ui.presentation.MutableObjectAdapter
 import org.jellyfin.androidtv.ui.presentation.PositionableListRowPresenter
+import androidx.leanback.widget.RowHeaderPresenter
 import org.jellyfin.androidtv.util.KeyProcessor
 import org.jellyfin.sdk.api.client.ApiClient
 import org.jellyfin.sdk.api.client.extensions.liveTvApi
@@ -81,7 +83,6 @@ class HomeRowsFragment : RowsSupportFragment(), AudioEventListener, View.OnKeyLi
 	private var currentItem: BaseRowItem? = null
 	private var currentRow: ListRow? = null
 	private var justLoaded = true
-
 	// Special rows
 	private val notificationsRow by lazy { NotificationsHomeFragmentRow(lifecycleScope, notificationsRepository) }
 	private val nowPlaying by lazy { HomeFragmentNowPlayingRow(mediaManager) }
@@ -90,7 +91,14 @@ class HomeRowsFragment : RowsSupportFragment(), AudioEventListener, View.OnKeyLi
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 
-		adapter = MutableObjectAdapter<Row>(PositionableListRowPresenter())
+		// Create a custom row presenter that keeps headers always visible
+		val rowPresenter = PositionableListRowPresenter(requireContext()).apply {
+			// Enable select effect for rows
+			setSelectEffectEnabled(true)
+		}
+		
+		// Set the adapter with our custom row presenter
+		adapter = MutableObjectAdapter<Row>(rowPresenter)
 
 		lifecycleScope.launch(Dispatchers.IO) {
 			val currentUser = withTimeout(30.seconds) {
@@ -153,8 +161,11 @@ class HomeRowsFragment : RowsSupportFragment(), AudioEventListener, View.OnKeyLi
 			withContext(Dispatchers.Main) {
 				// Create the CardPresenter with the desired size
 				// Parameters: (showInfo, staticHeight)
-				// Using a larger size (180) for better visibility
-				val cardPresenter = CardPresenter(true, 180)
+				// Using increased dimensions (30% larger) for both 'Recently Added' and genre rows
+                val cardPresenter = CardPresenter(true, 195).apply {
+                    // Set home screen flag to adjust episode card sizes
+                    setHomeScreen(true)
+                } // 150px * 1.3 = 195px height (30% increase)
 
 				// Add rows in order
 				val rowsAdapter = adapter as MutableObjectAdapter<Row>
@@ -166,6 +177,7 @@ class HomeRowsFragment : RowsSupportFragment(), AudioEventListener, View.OnKeyLi
 					helper.loadMyCollectionsRow().addToRowsAdapter(requireContext(), cardPresenter, rowsAdapter)
 				}
 
+                // Add Favorites row if enabled
 				                // Add Favorites row if enabled
                 if (userSettingPreferences.get(userSettingPreferences.showFavoritesRow)) {
                     Timber.d("Adding Favorites row")
@@ -391,23 +403,31 @@ class HomeRowsFragment : RowsSupportFragment(), AudioEventListener, View.OnKeyLi
         }
     }
 
-    private fun clearInfoPanel() {
+
+    private fun clearInfoPanel(forceClear: Boolean = false) {
         titleView?.setText("")
         infoRowView?.removeAllViews()
         summaryView?.setText("")
-        backgroundService.clearBackgrounds()
+        
+        // Only clear backgrounds if we're not on a Media Folders item or if forced
+        if (forceClear || currentItem == null || !homeFragmentViewsRow.isMediaFoldersItem(currentItem)) {
+            backgroundService.clearBackgrounds()
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         ensureViewsInitialized()
+        
+        // Initialize any additional views here
+        initializeViews()
     }
     
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        // Ensure views are updated when activity is recreated
-        ensureViewsInitialized()
+    private fun initializeViews() {
+        // Any additional view initialization can go here
     }
+
+private val homeFragmentViewsRow = HomeFragmentViewsRow(small = false)
 
 private inner class ItemViewSelectedListener : OnItemViewSelectedListener {
     override fun onItemSelected(
@@ -418,17 +438,38 @@ private inner class ItemViewSelectedListener : OnItemViewSelectedListener {
     ) {
         ensureViewsInitialized()
         
+        // Check if the item is from the Media Folders row or has the media_folders_item tag
+        val isMediaFolderItem = homeFragmentViewsRow.isMediaFoldersItem(item) || 
+                              (item is BaseRowItem && itemViewHolder?.view?.tag == "media_folders_item")
+        
+        if (isMediaFolderItem) {
+            // For Media Folders items, clear the info panel but keep the background
+            titleView?.setText("")
+            infoRowView?.removeAllViews()
+            summaryView?.setText("")
+            
+            // Set the background using the Media Folder's primary image
+            if (item is BaseRowItem) {
+                currentItem = item
+                currentRow = row as? ListRow
+                backgroundService.setBackground(item.baseItem)
+            }
+            return
+        }
+        
         if (item !is BaseRowItem) {
             currentItem = null
-            // Clear info panel
-            clearInfoPanel()
-            backgroundService.clearBackgrounds()
+            // Clear info panel and background
+            clearInfoPanel(true)
         } else {
             currentItem = item
-            currentRow = row as ListRow
-
-            val itemRowAdapter = row.adapter as? ItemRowAdapter
-            itemRowAdapter?.loadMoreItemsIfNeeded(itemRowAdapter.indexOf(item))
+            currentRow = row as? ListRow
+            
+            // Safely cast row to ListRow and get its adapter
+            (row as? ListRow)?.let { listRow ->
+                val itemRowAdapter = listRow.adapter as? ItemRowAdapter
+                itemRowAdapter?.loadMoreItemsIfNeeded(itemRowAdapter.indexOf(item))
+            }
 
             // Fill info panel
             titleView?.setText(item.getName(requireContext()))

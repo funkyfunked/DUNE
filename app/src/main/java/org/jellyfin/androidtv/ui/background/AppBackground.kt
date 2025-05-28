@@ -12,6 +12,9 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -104,22 +107,34 @@ fun AppBackground() {
     ) { background ->
         if (background != null) {
             Box(Modifier.fillMaxSize()) {
-                if (isImageReady && background != null) {
-                    Image(
-                        bitmap = background,
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop,
+                if (isImageReady) {
+                    // Container for top-right positioned backdrop
+                    Box(
                         modifier = Modifier
-                            .fillMaxSize()
-                            .then(if (blurBackground) Modifier.blur((blurIntensity * 20).dp) else Modifier)
-                            .fadingEdges(bottom = (backdropFadingIntensity * 300).toInt().dp),
-                        colorFilter = ColorFilter.tint(
-                            colorResource(R.color.background_filter).copy(
-                                alpha = dimmingIntensity
-                            ),
-                            BlendMode.SrcAtop
+                            .width(600.dp)  // 20% larger (500 * 1.2 = 600)
+                            .aspectRatio(16f / 9f)  // Maintain 16:9 aspect ratio
+                            .align(Alignment.TopEnd)  // Position in top-right corner
+                    ) {
+                        Image(
+                            bitmap = background,
+                            contentDescription = null,
+                            contentScale = ContentScale.Crop,
+                            alignment = Alignment.TopEnd,  // Align content to top-right
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .then(if (blurBackground) Modifier.blur((blurIntensity * 20).dp) else Modifier)
+                                .fadingEdges(
+                                    start = (backdropFadingIntensity * 200).toInt().dp,  // Fade from left
+                                    bottom = (backdropFadingIntensity * 300).toInt().dp  // Fade from bottom
+                                ),
+                            colorFilter = ColorFilter.tint(
+                                colorResource(R.color.background_filter).copy(
+                                    alpha = dimmingIntensity
+                                ),
+                                BlendMode.SrcAtop
+                            )
                         )
-                    )
+                    }
                 }
             }
         } else {
