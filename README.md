@@ -70,44 +70,7 @@ This project uses the following third-party libraries:
 - **Kotest** - [Apache-2.0](https://kotest.io/)
 - **MockK** - [Apache-2.0](https://mockk.io/)
 
-## Building from Source
 
-### Prerequisites
-
-- Android Studio
-- JDK 21+
-- Android SDK 35
-- Kotlin 2.0.21
-
-### Build Instructions
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/Sam42a/jellyfin-androidtv-Enhanced.git
-   cd jellyfin-androidtv-Enhanced
-   ```
-
-2. Open the project in Android Studio or build directly with Gradle:
-
-   **Standard Version:**
-   ```bash
-   ./gradlew assembleStandardDebug  # Debug build
-   ./gradlew assembleStandardRelease  # Release build
-   ```
-   
-   **Enhanced Version (installable alongside original Jellyfin):**
-   ```bash
-   ./gradlew buildEnhanced  # Custom task to build enhanced release version
-   ```
-
-### Installation
-
-```bash
-# Install standard version
-./gradlew installStandardDebug
-
-# Install enhanced version (can coexist with original Jellyfin)
-./gradlew installEnhancedRelease
 ```
 
 ## Contributing
