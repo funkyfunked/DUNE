@@ -93,9 +93,9 @@ object TelemetryService {
 		private fun CrashReportData.toReport(): String = buildMarkdown {
 			// Header
 			appendLine("---")
-			appendLine("client: Jellyfin for Android TV")
+			appendLine("client: Jellyfin Enhanced for Android TV")
 			appendLine("client_version: ${BuildConfig.VERSION_NAME}")
-			appendLine("client_repository: https://github.com/jellyfin/jellyfin-androidtv")
+			appendLine("client_repository: https://github.com/Sam42a/Jellyfin-Enhanced-Android-tv")
 			appendLine("type: crash_report")
 			appendLine("format: markdown")
 			appendLine("---")
