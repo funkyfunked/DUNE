@@ -41,6 +41,7 @@ import org.jellyfin.androidtv.ui.startup.fragment.ServerFragment
 import org.jellyfin.androidtv.ui.startup.fragment.SplashFragment
 import org.jellyfin.androidtv.ui.startup.fragment.StartupToolbarFragment
 import org.jellyfin.androidtv.util.applyTheme
+import org.jellyfin.androidtv.util.DeviceUtils
 import org.jellyfin.sdk.api.client.ApiClient
 import org.jellyfin.sdk.api.client.extensions.userLibraryApi
 import org.jellyfin.sdk.model.serializer.toUUIDOrNull
@@ -80,8 +81,11 @@ class StartupActivity : FragmentActivity() {
 			Toast.makeText(this, R.string.no_network_permissions, Toast.LENGTH_LONG).show()
 			finish()
 		} else {
-			// Request optional microphone permission
-			requestOptionalMicrophonePermission()
+			if (!DeviceUtils.isFireTv(this)) {
+				requestOptionalMicrophonePermission()
+			} else {
+				onPermissionsGranted()
+			}
 		}
 	}
 

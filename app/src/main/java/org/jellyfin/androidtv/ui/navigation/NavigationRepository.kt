@@ -70,7 +70,7 @@ class NavigationRepositoryImpl(
 	override fun navigate(destination: Destination, replace: Boolean) {
 		Timber.d("Navigating to $destination (via navigate function)")
 		val action = when (destination) {
-			is Destination.Fragment -> NavigationAction.NavigateFragment(destination, true, replace, false)
+			is Destination.Fragment -> NavigationAction.navigateFragment(destination, true, replace, false)
 		}
 		if (destination is Destination.Fragment) {
 			if (replace && fragmentHistory.isNotEmpty()) fragmentHistory[fragmentHistory.lastIndex] = destination
@@ -93,7 +93,7 @@ class NavigationRepositoryImpl(
 	override fun reset(destination: Destination.Fragment?, clearHistory: Boolean) {
 		fragmentHistory.clear()
 		val actualDestination = destination ?: defaultDestination
-		_currentAction.tryEmit(NavigationAction.NavigateFragment(actualDestination, true, false, clearHistory))
+		_currentAction.tryEmit(NavigationAction.navigateFragment(actualDestination, true, false, clearHistory))
 		Timber.d("Navigating to $actualDestination (via reset, clearHistory=$clearHistory)")
 	}
 }

@@ -16,6 +16,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import org.jellyfin.androidtv.R
 import org.jellyfin.androidtv.ui.navigation.NavigationAction
+import timber.log.Timber
 import java.util.Stack
 
 private class HistoryEntry(
@@ -69,7 +70,8 @@ class DestinationFragmentView @JvmOverloads constructor(
 
 	private val history = Stack<HistoryEntry>()
 
-	fun navigate(action: NavigationAction.NavigateFragment) {
+	fun navigate(action: NavigationAction) {
+		if (action !is NavigationAction.NavigateFragment) return
 		val entry = HistoryEntry(action.destination.fragment.java, action.destination.arguments)
 
 		// Create the base transaction so we can mutate everything at once
@@ -154,9 +156,25 @@ class DestinationFragmentView @JvmOverloads constructor(
 			else add(container.id, fragment, FRAGMENT_TAG_CONTENT)
 		}
 
-		// Commit
-		if (fragmentManager.isStateSaved) transaction.commitNowAllowingStateLoss()
-		else transaction.commitNow()
+		if (fragmentManager.isDestroyed) {
+
+
+			Timber.w("FragmentManager is already destroyed")
+
+
+		} else if (fragmentManager.isStateSaved) {
+
+
+			transaction.commitAllowingStateLoss()
+
+
+		} else {
+
+
+			transaction.commit()
+
+
+		}
 	}
 
 	override fun onSaveInstanceState(): Parcelable {
