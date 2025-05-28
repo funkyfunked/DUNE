@@ -1,85 +1,126 @@
 
-!TEMPORARY REPOSITORY! 
-
-# Jellyfine - Enhanced Jellyfin Android TV Client
---------------------------------------------------------------------------------------------------------------------
-
-[![GitHub release](https://img.shields.io/github/release/Sam42a/jellyfin-androidtv-Enhanced.svg)](https://github.com/Sam42a/jellyfin-androidtv-Enhanced/releases)
+# Dune -  Jellyfin Android TV Client
 
 
-Jellyfin Android TV is a Jellyfin client for Android TV, Nvidia Shield, and Amazon Fire TV devices. 
-
-
-
+[![License: GPL v2](https://img.shields.io/badge/License-GPL_v2-blue.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
 
 <p align="center">
-  <img src="https://i.imgur.com/uAtZZ2T.png">
+  <img src="https://i.imgur.com/qc4bNya.png](https://imgur.com/qc4bNya)?sanitize=true" alt=width="400">
 </p>
 
 
-This project is based on the official Jellyfin Android TV client 
 
 
+## About
 
-------------------------------------------------------------------------------------------------------------------------------------
-<h3 align="center">Fork of the <a href="https://jellyfin.org">Jellyfin Project</a></h3>
+**Dune** is a modified version of the official [Jellyfin](https://jellyfin.org/) Android TV client with UI/UX improvements and customizations.
 
----
+> **Note**: This is an unofficial fork/repository not affiliated with the Jellyfin project. The official Jellyfin Android TV client can be found at [jellyfin/jellyfin-androidtv](https://github.com/jellyfin/jellyfin-androidtv).
 
-<p align="center">
-<img alt="Logo banner" src="https://raw.githubusercontent.com/jellyfin/jellyfin-ux/master/branding/SVG/banner-logo-solid.svg?sanitize=true"/>
-<br/><br/>
-<a href="https://github.com/jellyfin/jellyfin-androidtv">
-<img alt="GPL 2.0 License" src="https://img.shields.io/github/license/jellyfin/jellyfin-androidtv.svg"/>
-</a>
-<a href="https://github.com/jellyfin/jellyfin-androidtv/releases">
-<img alt="Current Release" src="https://img.shields.io/github/release/jellyfin/jellyfin-androidtv.svg"/>
-</a>
-<a href="https://translate.jellyfin.org/projects/jellyfin-android/jellyfin-androidtv/">
-<img alt="Translation Status" src="https://translate.jellyfin.org/widgets/jellyfin-android/-/jellyfin-androidtv/svg-badge.svg"/>
-</a>
-<br/>
-<a href="https://opencollective.com/jellyfin">
-<img alt="Donate" src="https://img.shields.io/opencollective/all/jellyfin.svg?label=backers"/>
-</a>
-<a href="https://features.jellyfin.org">
-<img alt="Feature Requests" src="https://img.shields.io/badge/fider-vote%20on%20features-success.svg"/>
-</a>
-<a href="https://matrix.to/#/+jellyfin:matrix.org">
-<img alt="Chat on Matrix" src="https://img.shields.io/matrix/jellyfin:matrix.org.svg?logo=matrix"/>
-</a>
-<a href="https://www.reddit.com/r/jellyfin">
-<img alt="Join our Subreddit" src="https://img.shields.io/badge/reddit-r%2Fjellyfin-%23FF5700.svg"/>
-</a>
-<br/>
-<a href="https://play.google.com/store/apps/details?id=org.jellyfin.androidtv">
-<img width="153" alt="Jellyfin on Google Play" src="https://jellyfin.org/images/store-icons/google-play.png"/>
-</a>
-<a href="https://www.amazon.com/gp/aw/d/B07TX7Z725">
-<img width="153" alt="Jellyfin on Amazon Appstore" src="https://jellyfin.org/images/store-icons/amazon.png"/>
-</a>
-<a href="https://f-droid.org/en/packages/org.jellyfin.androidtv/">
-<img width="153" alt="Jellyfin on F-Droid" src="https://jellyfin.org/images/store-icons/fdroid.png"/>
-</a>
-<br/>
-<a href="https://repo.jellyfin.org/releases/client/androidtv/">Download archive</a>
-</p>
+## Modifications
 
-Jellyfin Android TV is a Jellyfin client for Android TV, Nvidia Shield, and Amazon Fire TV devices.
-We welcome all contributions and pull requests! If you have a larger feature in mind please open an
-issue so we can discuss the implementation before you start. 
+This fork includes the following changes from the official client:
+
+### UI/UX Improvements
+- **Homescreen Overhaul**: redesigned homescreen with improved layout and visual hierarchy
+- **Login Screen Redesign**: Enhanced login experience with modern design elements
+- **Search Screen**: Complete redesign with dedicated voice-to-text icon for easier navigation
+- **Dark Theme**: Improved dark theme based on [jellyfin-androidtv-OLED](https://github.com/LitCastVlog/jellyfin-androidtv-OLED)
+- **Visual Cleanup**: Optimized animations and visual elements for better performance
+
+### Customization Options
+- **Library Views**:
+  - Display library folders as sleek, simple buttons
+  - Option to show primary images as backdrops for library folders
+- **Homescreen Rows**:
+  - Add genre-based rows to the homescreen
+  - Add personal favorites/collections rows
+  - Show/hide specific rows based on user preference
+- **Card Sizes**:
+  - Improved card sizes for better visibility across different screen sizes
+  - Movies in "Continue Watching" now match episode card sizes
+  - Movie thumb images in "Continue Watching" for a consistent look
+
+### Media Playback
+- **Subtitles**: Enhanced subtitle customization options
+- **Backdrops & Backgrounds**: Customizable backdrop and background effects
+
+### Technical Improvements
+- Performance optimizations throughout the app
+- Modified app name and package for side-by-side installation with official client
+
+## License
+
+This project is licensed under the **GNU General Public License v2.0 (GPL-2.0)**. See the [LICENSE](LICENSE) file for details.
+
+```
+
+## Third-Party Libraries
+
+This project uses the following third-party libraries:
+
+- **Jellyfin SDK** - [GPL-2.0](https://github.com/jellyfin/sdk-kotlin)
+- **AndroidX Libraries** - [Apache-2.0](https://developer.android.com/jetpack/androidx)
+- **Kotlin Coroutines** - [Apache-2.0](https://github.com/Kotlin/kotlinx.coroutines)
+- **Koin** - [Apache-2.0](https://insert-koin.io/)
+- **Coil** - [Apache-2.0](https://coil-kt.github.io/coil/)
+- **Markwon** - [Apache-2.0](https://noties.io/Markwon/)
+- **Timber** - [Apache-2.0](https://github.com/JakeWharton/timber)
+- **ACRA** - [Apache-2.0](https://github.com/ACRA/acra)
+- **Kotest** - [Apache-2.0](https://kotest.io/)
+- **MockK** - [Apache-2.0](https://mockk.io/)
+
+## Building from Source
+
+### Prerequisites
+
+- Android Studio
+- JDK 21+
+- Android SDK 35
+- Kotlin 2.0.21
+
+### Build Instructions
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/Sam42a/jellyfin-androidtv-Enhanced.git
+   cd jellyfin-androidtv-Enhanced
+   ```
+
+2. Open the project in Android Studio or build directly with Gradle:
+
+   **Standard Version:**
+   ```bash
+   ./gradlew assembleStandardDebug  # Debug build
+   ./gradlew assembleStandardRelease  # Release build
+   ```
+   
+   **Enhanced Version (installable alongside original Jellyfin):**
+   ```bash
+   ./gradlew buildEnhanced  # Custom task to build enhanced release version
+   ```
+
+### Installation
+
+```bash
+# Install standard version
+./gradlew installStandardDebug
+
+# Install enhanced version (can coexist with original Jellyfin)
+./gradlew installEnhancedRelease
+```
+
+## Contributing
+
+Contributions are welcome! Please open an issue first to discuss what you would like to change.
+
+## Disclaimer
+
+This is an unofficial fork of the Jellyfin Android TV client. The Jellyfin name and logo are registered trademarks of the Jellyfin Project. This project is not affiliated with or endorsed by the Jellyfin Project.
 
 ## Translating
 
-Translations can be improved very easily from our
-[Weblate](https://translate.jellyfin.org/projects/jellyfin-android/jellyfin-androidtv) instance.
-Look through the following graphic to see if your native language could use some work!
-
-<a href="https://translate.jellyfin.org/engage/jellyfin-android/">
-<img alt="Detailed Translation Status" src="https://translate.jellyfin.org/widgets/jellyfin-android/-/jellyfin-androidtv/multi-auto.svg"/>
-</a>
-
-
+This project uses the same translation system as the original Jellyfin Android TV client. If you'd like to help with translations, please contribute to the [official Jellyfin Weblate instance](https://translate.jellyfin.org/projects/jellyfin-android/jellyfin-androidtv).
 
 ## Build Process
 
