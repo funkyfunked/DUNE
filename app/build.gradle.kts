@@ -92,7 +92,7 @@ android {
 			versionName = "0.18.8"
 			
 			// Set app name for the enhanced version
-			resValue("string", "app_name_release", "Jellyfine")
+			resValue("string", "app_name_release", "DUNE")
 			
 			// Add required string resources that are referenced in XML files
 			resValue("string", "app_id", applicationId!!)
