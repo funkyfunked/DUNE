@@ -33,22 +33,15 @@
         <item name="android:maxHeight">5sp</item>
     </style>
 
-    <style name="WindowAnimation"></style>
-
-    <style name="WindowAnimation.SlideTop">
-        <item name="android:windowEnterAnimation">@anim/abc_slide_in_top</item>
-        <item name="android:windowExitAnimation">@anim/abc_slide_out_top</item>
+    <style name="WindowAnimation">
+        <item name="android:windowEnterAnimation">@null</item>
+        <item name="android:windowExitAnimation">@null</item>
+        <item name="android:windowAnimationStyle">@null</item>
     </style>
 
-    <style name="WindowAnimation.SlideRight">
-        <item name="android:windowEnterAnimation">@anim/slide_right_in</item>
-        <item name="android:windowExitAnimation">@anim/slide_right_out</item>
-    </style>
-
-    <style name="WindowAnimation.Fade">
-        <item name="android:windowEnterAnimation">@anim/fade_in</item>
-        <item name="android:windowExitAnimation">@anim/fade_out</item>
-    </style>
+    <style name="WindowAnimation.SlideTop" parent="WindowAnimation"/>
+    <style name="WindowAnimation.SlideRight" parent="WindowAnimation"/>
+    <style name="WindowAnimation.Fade" parent="WindowAnimation"/>
 
     <style name="CenteredInputMethod" parent="@android:style/Widget.EditText">
         <item name="android:gravity">center</item>

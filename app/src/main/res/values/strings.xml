@@ -4,8 +4,9 @@
     <string name="pref_subtitles_vertical_offset_summary">Adjust the vertical position of subtitles. Negative moves up, positive moves down.</string>
     <string name="pref_subtitles_vertical_offset_center">Center</string>
     <string name="media_image">Media image</string>
-    <string name="app_name_release" translatable="false" tools:ignore="UnusedResources">Jellyfin</string>
-    <string name="app_name_debug" translatable="false" tools:ignore="UnusedResources">Jellyfin Debug</string>
+    <string name="profile_picture">Profile picture</string>
+    <string name="app_name_release" translatable="false" tools:ignore="UnusedResources">DUNE</string>
+    <string name="app_name_debug" translatable="false" tools:ignore="UnusedResources">DUNE Debug</string>
     <string name="video_error_unknown_error">Failed to load video</string>
     <string name="loading">Loading…</string>
     <string name="btn_cancel">Cancel</string>
@@ -38,10 +39,11 @@
     <string name="show_suggested_tv_shows_row">Show Suggested TV Shows row</string>
 <string name="lbl_suggested_tv_shows">Suggested TV Shows</string>
     <string name="lbl_search">Search</string>
+    <string name="lbl_library">Refresh</string>
     <string name="lbl_voice_search">Voice Search</string>
     <string name="msg_not_implemented">" not implemented"</string>
     <string name="lbl_latest">Recently added</string>
-    <string name="lbl_latest_in">Recently added in %1$s</string>
+    <string name="lbl_latest_in">Recently added in %s</string>
     <string name="lbl_by_name">By name</string>
     <string name="lbl_favorites">Favorites</string>
     <string name="lbl_coming_up">Coming up</string>
@@ -220,7 +222,6 @@
     <string name="lbl_play_next_up">Play next up</string>
     <string name="lbl_open">Open</string>
     <string name="lbl_show_backdrop">Show backdrops</string>
-    <string name="pref_show_backdrop_description">Change background image to selected items</string>
     <string name="lbl_show_premieres">Show season premieres</string>
     <string name="desc_premieres">Show a row of new episode pilots for any series you watch</string>
     <string name="lbl_in_x_days">In %d days</string>
@@ -345,6 +346,10 @@
     <string name="lbl_backdrop_blur">Backdrop blur</string>
     <string name="lbl_backdrop_fading">Backdrop fading</string>
     <string name="lbl_backdrop_dimming">Backdrop Dimming</string>
+    <string name="backdrop_settings">Backdrop Settings</string>
+    <string name="panel_title">Navigation</string>
+    <string name="backdrop_settings_description">Customize backdrop appearance and behavior</string>
+    <string name="pref_show_backdrop_description">Show backdrop images in the background of the app</string>
     <string name="pref_backdrop_blur_description">Control the blur effect of backdrop images from 0% (no blur) to 100% (full blur)</string>
     <string name="lbl_remove_user_content">Remove account</string>
     <string name="lbl_sign_out_content">Requires login on next use</string>
@@ -655,6 +660,10 @@
     <string name="show_reality_row">Show Reality Row</string>
     <string name="show_thriller_row">Show Thriller Row</string>
     <string name="show_war_row">Show War Row</string>
+    
+    <!-- Live TV Button -->
+    <string name="show_live_tv_button">Live TV Button</string>
+    <string name="show_live_tv_button_summary">Display the Live TV button in the top toolbar</string>
     <string name="move_up">Move Up</string>
     <string name="move_down">Move Down</string>
     <string name="enhanced_tweaks">Enhanced Tweaks</string>

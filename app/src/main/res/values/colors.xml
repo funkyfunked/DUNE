@@ -19,6 +19,7 @@
     <color name="red">#CC3333</color>
     <color name="transparent">#00000000</color>
     <color name="backdrop_dim_10">#1A000000</color>
+    <color name="black_overlay">#CC000000</color>
 
     <!-- Semi-Transparent Blacks -->
     <color name="black_transparent_dark">#E6000000</color>
@@ -48,6 +49,9 @@
     <color name="guide_movie_bg">#19461255</color>
     <color name="guide_sports_bg">#191C24AB</color>
     <color name="guide_news_bg">#1921A023</color>
+    
+    <!-- Launcher Icon Background -->
+    <color name="ic_launcher_background">#00A4DC</color>
     <color name="guide_kids_bg">#1901A0E2</color>
 
     <!-- button_default -->
