@@ -39,12 +39,6 @@ class CustomizationPreferencesScreen : OptionsFragment() {
 			}
 
 
-			checkbox {
-				setTitle(R.string.lbl_use_series_thumbnails)
-				setContent(R.string.lbl_use_series_thumbnails_description)
-				bind(userPreferences, UserPreferences.seriesThumbnailsEnabled)
-			}
-
 
 			enum<RatingType> {
 				setTitle(R.string.pref_default_rating)

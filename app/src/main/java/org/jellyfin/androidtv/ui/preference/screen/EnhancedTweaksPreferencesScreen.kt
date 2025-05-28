@@ -4,12 +4,11 @@ import org.jellyfin.androidtv.R
 import org.jellyfin.androidtv.preference.UserPreferences
 import org.jellyfin.androidtv.preference.UserSettingPreferences
 import org.jellyfin.androidtv.preference.constant.AppTheme
-import org.koin.android.ext.android.inject
 import org.jellyfin.androidtv.ui.preference.dsl.OptionsFragment
-import org.jellyfin.androidtv.ui.preference.dsl.enum
 import org.jellyfin.androidtv.ui.preference.dsl.checkbox
-import org.jellyfin.androidtv.ui.preference.dsl.list
+import org.jellyfin.androidtv.ui.preference.dsl.enum
 import org.jellyfin.androidtv.ui.preference.dsl.optionsScreen
+import org.koin.android.ext.android.inject
 
 class EnhancedTweaksPreferencesScreen : OptionsFragment() {
     private val userPreferences: UserPreferences by inject()
@@ -21,102 +20,29 @@ class EnhancedTweaksPreferencesScreen : OptionsFragment() {
         category {
             setTitle(R.string.enhanced_tweaks)
 
+            link {
+                setTitle(R.string.backdrop_settings)
+                setContent(R.string.backdrop_settings_description)
+                icon = R.drawable.ic_photo
+                withFragment<BackdropSettingsPreferencesScreen>()
+            }
+
             enum<AppTheme> {
                 setTitle(R.string.pref_app_theme)
                 bind(userPreferences, UserPreferences.appTheme)
             }
 
             checkbox {
-                setTitle(R.string.lbl_show_backdrop)
-                setContent(R.string.pref_show_backdrop_description)
-                bind(userPreferences, UserPreferences.backdropEnabled)
+                setTitle(R.string.show_live_tv_button)
+                setContent(R.string.show_live_tv_button_summary)
+                bind(userSettingPreferences, userSettingPreferences.showLiveTvButton)
             }
+
 
             checkbox {
                 setTitle(R.string.show_white_borders)
                 setContent(R.string.show_white_borders_summary)
                 bind(userPreferences, UserPreferences.showWhiteBorders)
-            }
-
-            list {
-                setTitle(R.string.lbl_backdrop_fading)
-                entries = mapOf(
-                    "0.0" to "0%",
-                    "0.1" to "10%",
-                    "0.2" to "20%",
-                    "0.3" to "30%",
-                    "0.4" to "40%",
-                    "0.5" to "50%",
-                    "0.6" to "60%",
-                    "0.7" to "70%",
-                    "0.8" to "80%",
-                    "0.9" to "90%",
-                    "1.0" to "100%"
-                )
-                bind {
-                    get { userPreferences[UserPreferences.backdropFadingIntensity].toString() }
-                    set { value -> userPreferences[UserPreferences.backdropFadingIntensity] = value.toFloat() }
-                    default { UserPreferences.backdropFadingIntensity.defaultValue.toString() }
-                }
-            }
-
-            list {
-                setTitle(R.string.lbl_backdrop_blur)
-                entries = mapOf(
-                    "0.0" to "0%",
-                    "0.1" to "10%",
-                    "0.2" to "20%",
-                    "0.3" to "30%",
-                    "0.4" to "40%",
-                    "0.5" to "50%",
-                    "0.6" to "60%",
-                    "0.7" to "70%",
-                    "0.8" to "80%",
-                    "0.9" to "90%",
-                    "1.0" to "100%"
-                )
-                bind {
-                    get { userPreferences[UserPreferences.backdropBlurIntensity].toString() }
-                    set { value -> userPreferences[UserPreferences.backdropBlurIntensity] = value.toFloat() }
-                    default { UserPreferences.backdropBlurIntensity.defaultValue.toString() }
-                }
-            }
-
-            list {
-                setTitle(R.string.lbl_backdrop_dimming)
-                entries = mapOf(
-                    "0.0" to "0%",
-                    "0.1" to "10%",
-                    "0.2" to "20%",
-                    "0.3" to "30%",
-                    "0.4" to "40%",
-                    "0.5" to "50%",
-                    "0.6" to "60%",
-                    "0.7" to "70%",
-                    "0.8" to "80%",
-                    "0.9" to "90%",
-                    "1.0" to "100%"
-                )
-                bind {
-                    get { userPreferences[UserPreferences.backdropDimmingIntensity].toString() }
-                    set { value -> userPreferences[UserPreferences.backdropDimmingIntensity] = value.toFloat() }
-                    default { UserPreferences.backdropDimmingIntensity.defaultValue.toString() }
-                }
-            }
-
-
-            list {
-                setTitle(R.string.image_quality)
-                entries = mapOf(
-                    "low" to getString(R.string.image_quality_low),
-                    "normal" to getString(R.string.image_quality_normal),
-                    "high" to getString(R.string.image_quality_high)
-                )
-                bind {
-                    get { userPreferences[UserPreferences.imageQuality] }
-                    set { value -> userPreferences[UserPreferences.imageQuality] = value }
-                    default { UserPreferences.imageQuality.defaultValue }
-                }
             }
         }
 
