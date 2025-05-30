@@ -1,7 +1,9 @@
 package org.jellyfin.androidtv.ui.card;
 
 import android.app.Activity;
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 import android.view.KeyEvent;
@@ -12,16 +14,20 @@ import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.leanback.widget.BaseCardView;
+import androidx.lifecycle.LifecycleOwner;
 
 import org.jellyfin.androidtv.R;
 import org.jellyfin.androidtv.databinding.ViewCardLegacyImageBinding;
+import org.jellyfin.androidtv.preference.UserPreferences;
 import org.jellyfin.androidtv.ui.AsyncImageView;
 import org.jellyfin.androidtv.ui.itemhandling.BaseItemDtoBaseRowItem;
 import org.jellyfin.androidtv.ui.itemhandling.BaseRowItem;
 import org.jellyfin.androidtv.util.ContextExtensionsKt;
 import org.jellyfin.androidtv.util.DateTimeExtensionsKt;
 import org.jellyfin.androidtv.util.Utils;
+import timber.log.Timber;
 
 import java.text.NumberFormat;
 
@@ -29,7 +35,7 @@ import java.text.NumberFormat;
  * Modified ImageCard with no fade on the badge
  * A card view with an {@link ImageView} as its main region.
  */
-public class LegacyImageCardView extends BaseCardView {
+public class LegacyImageCardView extends BaseCardView implements androidx.lifecycle.LifecycleObserver {
     private ViewCardLegacyImageBinding binding = ViewCardLegacyImageBinding.inflate(LayoutInflater.from(getContext()), this);
     private ImageView mBanner;
     private int BANNER_SIZE = Utils.convertDpToPixel(getContext(), 50);
@@ -57,24 +63,71 @@ public class LegacyImageCardView extends BaseCardView {
         setForeground(null);
 
         // Add focus/selection listener for border
-        setOnFocusChangeListener((v, hasFocus) -> updateCardBorder());
-        setOnClickListener(v -> updateCardBorder());
+        setOnFocusChangeListener((v, hasFocus) -> {
+            Timber.d("Focus changed: %s", hasFocus);
+            updateCardBorder();
+        });
+        setFocusable(true);
+        setFocusableInTouchMode(true);
+        
+        // Set click listener for selection (if needed)
+        setOnClickListener(v -> {
+            setSelected(!isSelected());
+            Timber.d("Clicked, selected: %s", isSelected());
+            updateCardBorder();
+        });
+
+        // Register for lifecycle events to update the border when preferences change
+        Activity activity = ContextExtensionsKt.getActivity(getContext());
+        if (activity instanceof LifecycleOwner) {
+            ((LifecycleOwner) activity).getLifecycle().addObserver(this);
+        }
     }
 
+    private boolean isFocusedState = false;
+    
+    @SuppressLint({"NewApi", "WrongConstant"})
     private void updateCardBorder() {
+        // Get the preference using the static method
         android.content.SharedPreferences prefs = androidx.preference.PreferenceManager.getDefaultSharedPreferences(getContext());
         boolean showWhiteBorders = prefs.getBoolean(org.jellyfin.androidtv.preference.UserPreferences.getShowWhiteBordersKey(), false);
-        Drawable border = androidx.core.content.ContextCompat.getDrawable(getContext(), R.drawable.card_focused_border);
-        View mainImage = findViewById(R.id.main_image);
-        if (mainImage != null) {
-            if ((isFocused() || isSelected()) && border != null && showWhiteBorders) {
-                mainImage.setForeground(border);
-            } else {
-                mainImage.setForeground(null);
-            }
+        
+        Timber.d("showWhiteBorders: %s, isFocused: %s, isSelected: %s", 
+            showWhiteBorders, isFocused(), isSelected());
+            
+        boolean shouldShowBorder = showWhiteBorders && (isFocused() || isSelected());
+        
+        // Skip if state hasn't changed
+        if (isFocusedState == shouldShowBorder) return;
+        isFocusedState = shouldShowBorder;
+        
+        if (shouldShowBorder) {
+            // Apply border to the main image view instead of the entire card
+            binding.mainImage.setForeground(ContextCompat.getDrawable(getContext(), R.drawable.card_focused_border));
+        } else {
+            binding.mainImage.setForeground(null);
         }
-        // Remove border from the card itself
-        setForeground(null);
+        
+        // Invalidate the view to ensure the border is redrawn
+        binding.mainImage.invalidate();
+    }
+    
+    @Override
+    protected void onFocusChanged(boolean gainFocus, int direction, android.graphics.Rect previouslyFocusedRect) {
+        super.onFocusChanged(gainFocus, direction, previouslyFocusedRect);
+        updateCardBorder();
+    }
+    
+    @Override
+    public void setSelected(boolean selected) {
+        super.setSelected(selected);
+        updateCardBorder();
+    }
+
+    @androidx.lifecycle.OnLifecycleEvent(androidx.lifecycle.Lifecycle.Event.ON_RESUME)
+    public void onResume() {
+        // Update border state when preferences might have changed
+        updateCardBorder();
     }
 
     public void setBanner(int bannerResource) {

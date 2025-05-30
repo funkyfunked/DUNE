@@ -10,104 +10,116 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.core.view.updateLayoutParams
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.OnLifecycleEvent
 import org.jellyfin.androidtv.R
 import org.jellyfin.androidtv.databinding.ViewCardDefaultBinding
+import org.jellyfin.androidtv.preference.UserPreferences
 import org.jellyfin.androidtv.util.MenuBuilder
 import org.jellyfin.androidtv.util.popupMenu
 import org.jellyfin.androidtv.util.showIfNotEmpty
 import kotlin.math.roundToInt
 
 class DefaultCardView @JvmOverloads constructor(
-	context: Context,
-	attrs: AttributeSet? = null,
-	defStyleAttr: Int = 0,
-	defStyleRes: Int = 0,
-) : FrameLayout(context, attrs, defStyleAttr, defStyleRes) {
-	init {
-		isFocusable = true
-		descendantFocusability = ViewGroup.FOCUS_BLOCK_DESCENDANTS
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) defaultFocusHighlightEnabled = false
-	}
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0,
+    defStyleRes: Int = 0,
+) : FrameLayout(context, attrs, defStyleAttr, defStyleRes), LifecycleObserver {
 
-	val binding = ViewCardDefaultBinding.inflate(LayoutInflater.from(context), this, true)
+    init {
+        isFocusable = true
+        descendantFocusability = ViewGroup.FOCUS_BLOCK_DESCENDANTS
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) defaultFocusHighlightEnabled = false
+    }
 
-	fun setSize(size: Size) = when (size) {
-		Size.SQUARE -> setSize(size.width, size.height)
-		Size.SQUARE_SMALL -> setSize(size.width, size.height)
-	}
+    val binding = ViewCardDefaultBinding.inflate(LayoutInflater.from(context), this, true)
 
-	private fun setSize(newWidth: Int, newHeight: Int) {
-		binding.bannerContainer.updateLayoutParams {
-			@Suppress("MagicNumber")
-			height = (newHeight * context.resources.displayMetrics.density + 0.5f).roundToInt()
-		}
+    fun setSize(size: Size) = when (size) {
+        Size.SQUARE -> setSize(size.width, size.height)
+        Size.SQUARE_SMALL -> setSize(size.width, size.height)
+    }
 
-		val horizontalPadding = with(binding.container) { paddingStart + paddingEnd }
-		binding.container.updateLayoutParams {
-			@Suppress("MagicNumber")
-			width = (newWidth * context.resources.displayMetrics.density + 0.5f).roundToInt() + horizontalPadding
-		}
+    private fun setSize(newWidth: Int, newHeight: Int) {
+        binding.bannerContainer.updateLayoutParams {
+            @Suppress("MagicNumber")
+            height = (newHeight * context.resources.displayMetrics.density + 0.5f).roundToInt()
+        }
 
-		invalidate()
-	}
+        val horizontalPadding = with(binding.container) { paddingStart + paddingEnd }
+        binding.container.updateLayoutParams {
+            @Suppress("MagicNumber")
+            width = (newWidth * context.resources.displayMetrics.density + 0.5f).roundToInt() + horizontalPadding
+        }
 
-	fun setImage(
-		url: String? = null,
-		blurHash: String? = null,
-		placeholder: Drawable? = null,
-	) = binding.banner.load(url, blurHash, placeholder)
+        invalidate()
+    }
 
-	fun setPopupMenu(init: MenuBuilder.() -> Unit) {
-		setOnLongClickListener {
-			popupMenu(context, binding.root, init = init).showIfNotEmpty()
-		}
-	}
+    fun setImage(
+        url: String? = null,
+        blurHash: String? = null,
+        placeholder: Drawable? = null,
+    ) = binding.banner.load(url, blurHash, placeholder)
 
-	override fun onKeyUp(keyCode: Int, event: KeyEvent): Boolean {
-		if (super.onKeyUp(keyCode, event)) return true
+    fun setPopupMenu(init: MenuBuilder.() -> Unit) {
+        setOnLongClickListener {
+            popupMenu(context, binding.root, init = init).showIfNotEmpty()
+        }
+    }
 
-		// Menu key should show the popup menu
-		if (event.keyCode == KeyEvent.KEYCODE_MENU) return performLongClick()
+    override fun onKeyUp(keyCode: Int, event: KeyEvent): Boolean {
+        if (super.onKeyUp(keyCode, event)) return true
 
-		return false
-	}
+        // Menu key should show the popup menu
+        if (event.keyCode == KeyEvent.KEYCODE_MENU) return performLongClick()
 
-	private var currentScale: Float = 0.95f
-	private var isFocused: Boolean = false
+        return false
+    }
 
-	override fun onFocusChanged(gainFocus: Boolean, direction: Int, previouslyFocusedRect: Rect?) {
-		super.onFocusChanged(gainFocus, direction, previouslyFocusedRect)
-		
-		// Skip if focus state hasn't changed
-		if (isFocused == gainFocus) return
-		isFocused = gainFocus
-		
-		// Cancel any ongoing animations
-		animate().cancel()
+    private var currentScale: Float = 0.95f
+    private var isFocused: Boolean = false
 
-		// Use a simpler scale factor to reduce rendering load
-		val targetScale = if (gainFocus) 1.0f else 0.95f
-		
-		// Only update if scale has changed
-		if (currentScale != targetScale) {
-			currentScale = targetScale
-			scaleX = targetScale
-			scaleY = targetScale
-		}
-		
-		// Show/hide white border overlay if enabled in preferences
-		val prefs = org.jellyfin.androidtv.preference.UserPreferences(context)
-		val showWhiteBorders = prefs[org.jellyfin.androidtv.preference.UserPreferences.showWhiteBorders]
-		
-		// Only update foreground if needed
-		if (gainFocus && showWhiteBorders) {
-			if (foreground == null) {
-				foreground = context.getDrawable(R.drawable.card_focused_border)
-			}
-		} else {
-			foreground = null
-		}
-	}
+    private fun updateWhiteBorder(hasFocus: Boolean) {
+        val prefs = UserPreferences(context)
+        val showWhiteBorders = prefs[UserPreferences.showWhiteBorders]
+        
+        if (hasFocus && showWhiteBorders) {
+            if (foreground == null) {
+                foreground = context.getDrawable(R.drawable.card_focused_border)
+            }
+        } else {
+            foreground = null
+        }
+    }
+
+    override fun onFocusChanged(gainFocus: Boolean, direction: Int, previouslyFocusedRect: Rect?) {
+        super.onFocusChanged(gainFocus, direction, previouslyFocusedRect)
+        
+        // Skip if focus state hasn't changed
+        if (isFocused == gainFocus) return
+        isFocused = gainFocus
+        
+        // Cancel any ongoing animations
+        animate().cancel()
+        
+        // Update scale
+        val targetScale = if (gainFocus) 1.0f else 0.95f
+        if (currentScale != targetScale) {
+            currentScale = targetScale
+            scaleX = targetScale
+            scaleY = targetScale
+        }
+        
+        // Update white border
+        updateWhiteBorder(gainFocus)
+    }
+    
+    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
+    fun onResume() {
+        // Update border state when preferences might have changed
+        updateWhiteBorder(hasFocus())
+    }
 
 	@Suppress("MagicNumber")
 	enum class Size(val width: Int, val height: Int) {
