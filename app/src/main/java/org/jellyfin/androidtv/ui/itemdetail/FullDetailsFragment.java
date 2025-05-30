@@ -2,6 +2,8 @@ package org.jellyfin.androidtv.ui.itemdetail;
 
 import static org.koin.java.KoinJavaComponent.inject;
 
+import org.koin.java.KoinJavaComponent;
+
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.graphics.Point;
@@ -799,6 +801,49 @@ public class FullDetailsFragment extends Fragment implements RecordingIndicatorV
             });
 
             mDetailsOverviewRow.addAction(playButton);
+
+            // Add External Player button
+            if (BaseItemExtensionsKt.canPlay(mBaseItem) && mBaseItem.getMediaSources() != null && !mBaseItem.getMediaSources().isEmpty()) {
+                TextUnderButton externalPlayerButton = TextUnderButton.create(requireContext(), 
+                    R.drawable.ic_external_player, buttonSize, 2, 
+                    getString(R.string.lbl_play_external), new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            // Create a list with just the current item to pass to the player
+                            List<BaseItemDto> items = new ArrayList<>();
+                            items.add(mBaseItem);
+                            // Set external player preference
+                            Timber.d("Preparing to play item in external player");
+                            UserPreferences prefs = userPreferences.getValue();
+                            boolean originalPref = prefs.get(UserPreferences.Companion.getUseExternalPlayer());
+                            prefs.set(UserPreferences.Companion.getUseExternalPlayer(), true);
+                            try {
+                                // Check if there are any items to play
+                                if (items == null || items.isEmpty()) {
+                                    Timber.e("No items to play in external player");
+                                    Utils.showToast(requireContext(), getString(R.string.msg_no_playable_items));
+                                    return;
+                                }
+                                
+                                // Log the item being played
+                                BaseItemDto item = items.get(0);
+                                Timber.d("Attempting to play item in external player: %s (ID: %s, Type: %s)", 
+                                    item.getName(), item.getId(), item.getType());
+                                
+                                play(items, 0, false);
+                                Timber.d("Successfully launched external player");
+                            } catch (Exception e) {
+                                Timber.e(e, "Error launching external player");
+                                Utils.showToast(requireContext(), getString(R.string.msg_external_player_error));
+                            } finally {
+                                // Restore original preference
+                                prefs.set(UserPreferences.Companion.getUseExternalPlayer(), originalPref);
+                                Timber.d("Restored external player preference to: %b", originalPref);
+                            }
+                        }
+                    });
+                mDetailsOverviewRow.addAction(externalPlayerButton);
+            }
 
             if (resumeButtonVisible) {
                 mResumeButton.requestFocus();

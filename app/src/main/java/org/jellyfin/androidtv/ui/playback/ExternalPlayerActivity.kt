@@ -17,6 +17,7 @@ import org.jellyfin.androidtv.util.sdk.getDisplayName
 import org.jellyfin.sdk.api.client.ApiClient
 import org.jellyfin.sdk.api.client.extensions.playStateApi
 import org.jellyfin.sdk.api.client.extensions.subtitleApi
+import org.jellyfin.sdk.api.client.extensions.userLibraryApi
 import org.jellyfin.sdk.api.client.extensions.videosApi
 import org.jellyfin.sdk.model.api.BaseItemDto
 import org.jellyfin.sdk.model.api.BaseItemKind
@@ -42,6 +43,12 @@ import kotlin.time.Duration.Companion.milliseconds
 class ExternalPlayerActivity : FragmentActivity() {
 	companion object {
 		const val EXTRA_POSITION = "position"
+
+		// Minimum percentage of the video that needs to be watched to be marked as completed
+		private const val MINIMUM_COMPLETION_PERCENTAGE = 0.9
+		
+		// Minimum duration (in seconds) that needs to be watched to update the resume position
+		private const val MINIMUM_WATCH_DURATION_SECONDS = 10L
 
 		// https://mx.j2inter.com/api
 		private const val API_MX_TITLE = "title"
@@ -73,14 +80,18 @@ class ExternalPlayerActivity : FragmentActivity() {
 
 	private val playVideoLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
 		Timber.i("Playback finished with result code ${result.resultCode}")
-		videoQueueManager.setCurrentMediaPosition(videoQueueManager.getCurrentMediaPosition() + 1)
-
-		if (result.resultCode != RESULT_OK) {
+		
+		// Only show an error if the result indicates a failure (like RESULT_CANCELED with specific error data)
+		val isError = result.resultCode == RESULT_CANCELED && result.data?.extras?.keySet()?.isNotEmpty() == true
+		
+		if (isError) {
+			Timber.w("External player reported an error: ${result.data}")
 			Toast.makeText(this, R.string.video_error_unknown_error, Toast.LENGTH_LONG).show()
-			finish()
-		} else {
-			onItemFinished(result.data)
 		}
+		
+		// Always update the queue position and process the result
+		videoQueueManager.setCurrentMediaPosition(videoQueueManager.getCurrentMediaPosition() + 1)
+		onItemFinished(result.data)
 	}
 
 	private var currentItem: Pair<BaseItemDto, MediaSourceInfo>? = null
@@ -170,52 +181,85 @@ class ExternalPlayerActivity : FragmentActivity() {
 		}
 	}
 
+    private fun onItemFinished(result: Intent?) {
+        if (currentItem == null) {
+            Timber.w("No current item when finishing playback")
+            // Don't show an error here as it might be a normal exit
+            finish()
+            return
+        }
 
-	private fun onItemFinished(result: Intent?) {
-		if (currentItem == null) {
-			Toast.makeText(this@ExternalPlayerActivity, R.string.video_error_unknown_error, Toast.LENGTH_LONG).show()
-			finish()
-			return
-		}
+        val (item, mediaSource) = currentItem!!
+        val extras = result?.extras ?: Bundle.EMPTY
 
-		val (item, mediaSource) = currentItem!!
-		val extras = result?.extras ?: Bundle.EMPTY
+        // Get the final position from the external player
+        val endPosition = Companion.resultPositionExtras.firstNotNullOfOrNull { key ->
+            @Suppress("DEPRECATION") val value = extras.get(key)
+            if (value is Number) value.toLong().milliseconds
+            else null
+        }
 
-		val endPosition = resultPositionExtras.firstNotNullOfOrNull { key ->
-			@Suppress("DEPRECATION") val value = extras.get(key)
-			if (value is Number) value.toLong().milliseconds
-			else null
-		}
+        val runtime = (mediaSource.runTimeTicks ?: item.runTimeTicks)?.ticks
+        
+        // Only mark as watched if a significant portion was played
+        val shouldMarkAsWatched = runtime?.let { 
+            endPosition != null && endPosition >= (it * MINIMUM_COMPLETION_PERCENTAGE)
+        } ?: false
+        
+        // Only update the resume position if enough time was watched
+        val shouldUpdateResumePosition = runtime?.let {
+            endPosition != null && 
+            endPosition.inWholeSeconds >= MINIMUM_WATCH_DURATION_SECONDS &&
+            endPosition < (it * 0.9) // Don't update if we're close to the end
+        } ?: false
 
-		val runtime = (mediaSource.runTimeTicks ?: item.runTimeTicks)?.ticks
-		val shouldPlayNext = runtime != null && endPosition != null && endPosition >= (runtime * 0.9)
+        Timber.d("Playback finished - Runtime: ${runtime?.inWholeSeconds}s, Position: ${endPosition?.inWholeSeconds}s, " +
+                "Mark as watched: $shouldMarkAsWatched, Update resume: $shouldUpdateResumePosition")
 
-		lifecycleScope.launch {
-			runCatching {
-				withContext(Dispatchers.IO) {
-					api.playStateApi.reportPlaybackStopped(
-						PlaybackStopInfo(
-							itemId = item.id,
-							mediaSourceId = mediaSource.id,
-							positionTicks = endPosition?.inWholeTicks,
-							failed = false,
-						)
-					)
-				}
-			}.onFailure { error ->
-				Timber.w(error, "Failed to report playback stop event")
-				Toast.makeText(this@ExternalPlayerActivity, R.string.video_error_unknown_error, Toast.LENGTH_LONG).show()
-			}
+        lifecycleScope.launch {
+            try {
+                withContext(Dispatchers.IO) {
+                    // Only report stop if we have a valid position or we're marking as watched
+                    if (shouldMarkAsWatched || shouldUpdateResumePosition) {
+                        // Report the playback stopped with the final position
+                        api.playStateApi.reportPlaybackStopped(
+                            PlaybackStopInfo(
+                                itemId = item.id,
+                                mediaSourceId = mediaSource.id,
+                                positionTicks = if (shouldMarkAsWatched) null else endPosition?.inWholeTicks,
+                                failed = false,
+                            )
+                        )
+                        
+                        // If we're marking as watched, also update the user data
+                        if (shouldMarkAsWatched) {
+                            Timber.d("Marking item ${item.id} as watched")
+                            // The playStateApi call above with positionTicks=null should mark as watched
+                            // No need for additional API calls
+                        }
+                    } else {
+                        Timber.d("Not enough watch time to update progress")
+                    }
+                }
+            } catch (error: Exception) {
+                Timber.w(error, "Failed to report playback stop event")
+                // Don't show an error toast as it might be confusing to the user
+            }
 
-			dataRefreshService.lastPlayback = Instant.now()
-			when (item.type) {
-				BaseItemKind.MOVIE -> dataRefreshService.lastMoviePlayback = Instant.now()
-				BaseItemKind.EPISODE -> dataRefreshService.lastTvPlayback = Instant.now()
-				else -> Unit
-			}
+            // Update the last playback time
+            dataRefreshService.lastPlayback = Instant.now()
+            when (item.type) {
+                BaseItemKind.MOVIE -> dataRefreshService.lastMoviePlayback = Instant.now()
+                BaseItemKind.EPISODE -> dataRefreshService.lastTvPlayback = Instant.now()
+                else -> Unit
+            }
 
-			if (shouldPlayNext) playNext()
-			else finish()
-		}
-	}
+            // Only auto-play next if we've watched enough of the current item
+            if (shouldMarkAsWatched) {
+                playNext()
+            } else {
+                finish()
+            }
+        }
+    }
 }
