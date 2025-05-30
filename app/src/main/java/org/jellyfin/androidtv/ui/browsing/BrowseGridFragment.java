@@ -912,7 +912,11 @@ public class BrowseGridFragment extends Fragment implements View.OnKeyListener {
         public void run() {
             if (!getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) return;
 
-            backgroundService.getValue().setBackground(mCurrentItem.getBaseItem());
+            // Don't set background in grid browse views (both horizontal and vertical)
+            if (!(mGridPresenter instanceof HorizontalGridPresenter) && 
+                !(mGridPresenter instanceof VerticalGridPresenter)) {
+                backgroundService.getValue().setBackground(mCurrentItem.getBaseItem());
+            }
             setItem(mCurrentItem);
         }
     };
