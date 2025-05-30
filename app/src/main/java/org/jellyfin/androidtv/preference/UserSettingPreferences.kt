@@ -62,8 +62,8 @@ class UserSettingPreferences(context: Context) : SharedPreferenceStore(
     val skipForwardLength = intPreference("skipForwardLength", 30_000)
 
     // Media folder display options
-    val useExtraSmallMediaFolders = booleanPreference("useExtraSmallMediaFolders", false)
-    val showLiveTvButton = booleanPreference("show_live_tv_button", true)
+    val useExtraSmallMediaFolders = booleanPreference("useExtraSmallMediaFolders", true)
+    val showLiveTvButton = booleanPreference("show_live_tv_button", false)
 
     val homesection0 = enumPreference("homesection0", HomeSectionType.LIBRARY_TILES_SMALL)
     val homesection1 = enumPreference("homesection1", HomeSectionType.RESUME)

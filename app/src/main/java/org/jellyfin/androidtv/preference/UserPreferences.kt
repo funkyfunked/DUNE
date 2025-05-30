@@ -59,12 +59,12 @@ class UserPreferences(context: Context) : SharedPreferenceStore(
         /**
          * Backdrop blur intensity from 0.0 (no blur) to 1.0 (full blur)
          */
-        var backdropBlurIntensity = floatPreference("pref_backdrop_blur_intensity", 0.5f)
+        var backdropBlurIntensity = floatPreference("pref_backdrop_blur_intensity", 0.0f)
 
 		/**
 		 * Backdrop dimming intensity from 0 (no dimming) to 1.0 (full black)
 		 */
-		var backdropDimmingIntensity = floatPreference("pref_backdrop_dimming_intensity", 0.5f)
+		var backdropDimmingIntensity = floatPreference("pref_backdrop_dimming_intensity", 0.1f)
 
 		/**
 		 * Backdrop fading intensity from 0 (no fade) to 1.0 (full fade)
