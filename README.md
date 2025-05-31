@@ -1,8 +1,10 @@
 
-# Dune -  Jellyfin Android TV Client
-
+# Dune - Jellyfin Android TV Client
 
 [![License: GPL v2](https://img.shields.io/badge/License-GPL_v2-blue.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
+
+Copyright (C) 2025 Sam42a  
+Based on Jellyfin Android TV (C) Jellyfin Contributors
 
 <p align="center">
   <img src="https://i.imgur.com/qc4bNya.png](https://imgur.com/qc4bNya)?sanitize=true" alt=width="400">
@@ -49,6 +51,11 @@ This fork includes the following changes from the official client:
 - Performance optimizations throughout the app
 - Modified app name and package for side-by-side installation with official client
 
+
+## Acknowledgments
+
+This project is based on the work of the Jellyfin Contributors. Special thanks to all the developers and community members who have contributed to the Jellyfin Android TV project.
+
 ## License
 
 This project is licensed under the **GNU General Public License v2.0 (GPL-2.0)**. See the [LICENSE](LICENSE) file for details.
@@ -76,6 +83,20 @@ This project uses the following third-party libraries:
 ## Contributing
 
 Contributions are welcome! Please open an issue first to discuss what you would like to change.
+
+## Source Code
+
+This project is a modified version of the Jellyfin Android TV client. The complete source code, including modifications, is available under the terms of the GPL-2.0 license.
+
+For developers working with modified files, please include the following header at the top of any significantly modified files:
+
+```
+/*
+ * This file is part of Dune, a modified version of Jellyfin Android TV.
+ * Original source: [original file path in Jellyfin repo]
+ * Modifications (C) 2025 Sam42a
+ */
+```
 
 ## Disclaimer
 
