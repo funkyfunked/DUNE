@@ -656,6 +656,12 @@
     <string name="show_family_row">Show Family Row</string>
     <string name="show_horror_row">Show Horror Row</string>
     <string name="show_fantasy_row">Show Fantasy Row</string>
+    
+    <!-- Exit confirmation dialog -->
+    <string name="exit_app_title">Exit DUNE</string>
+    <string name="exit_app_message">Are you sure you want to exit?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
     <string name="show_history_row">Show History Row</string>
     <string name="show_music_row">Show Music Row</string>
     <string name="show_mystery_row">Show Mystery Row</string>
