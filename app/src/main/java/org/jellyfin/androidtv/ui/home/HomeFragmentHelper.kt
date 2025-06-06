@@ -148,10 +148,12 @@ class HomeFragmentHelper(
         val query = org.jellyfin.sdk.model.api.request.GetItemsRequest(
             fields = ItemRepository.itemFields,
             includeItemTypes = setOf(BaseItemKind.BOX_SET),
+			sortOrder = SortOrder.Descending,
+			filters = setOf(ItemFilter.IS_FAVORITE),
             recursive = true,
             imageTypeLimit = 1,
             limit = 20,
-            sortBy = setOf(ItemSortBy.SORT_NAME),
+            sortBy = setOf(ItemSortBy.DATE_CREATED),
         )
 
         // Create a custom row with no-info card style
@@ -170,7 +172,8 @@ class HomeFragmentHelper(
             fields = ItemRepository.itemFields,
             recursive = true,
             excludeItemTypes = setOf(
-                BaseItemKind.EPISODE,
+                BaseItemKind.BOX_SET,
+				BaseItemKind.EPISODE,
                 BaseItemKind.MUSIC_ARTIST,
                 BaseItemKind.MUSIC_ALBUM,
                 BaseItemKind.MUSIC_VIDEO,
