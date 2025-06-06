@@ -149,7 +149,7 @@ class HomeFragmentHelper(
         val query = org.jellyfin.sdk.model.api.request.GetItemsRequest(
             fields = ItemRepository.itemFields,
             includeItemTypes = setOf(BaseItemKind.BOX_SET),
-			sortOrder = SortOrder.Descending,
+			sortOrder = setOf(SortOrder.DESCENDING),
 			filters = setOf(ItemFilter.IS_FAVORITE),
             recursive = true,
             imageTypeLimit = 1,
